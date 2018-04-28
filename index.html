@@ -722,9 +722,9 @@
         method: 'GET',
         path: '/api/0.6/user/details'
       }, function(err, data) {
-        parser = new DOMParser();
-        detailsXML = parser.parseFromString(text, data);
-        userElem.getElementByTagName('user')[0];
+        var parser = new DOMParser();
+        var detailsXML = parser.parseFromString(text, data);
+        var userElem = detailsXML.getElementByTagName('user')[0];
 
         var display_name = userElem.getAttribute('display_name');
         var id = userElem.getAttribute('id');
