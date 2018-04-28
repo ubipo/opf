@@ -95,6 +95,9 @@
       .checked {
         background-color: #53b162;
       }
+      #data-actions button, span {
+        margin-bottom: 0.3em;
+      }
     </style>
 
   </head>
@@ -183,10 +186,17 @@
 
     <h2>Step 3: upload data</h2>
 
-    <button id="gen-osm-change">Generate OsmChange file for download</button>
-    <a id="osm-change-dl"></a>
-
-    <button id="upload-osm-change">Upload changes to OSM API directly</button>
+    <div id="data-actions">
+      <p>
+        <button id="gen-osm-change">Generate OsmChange file for download</button>
+        <a id="osm-change-dl"></a>
+      </p>
+      <p>
+        <button id="login">Login</button>
+        <span id="user-details"></span>
+        <button id="upload-osm-change">Upload changes to OSM API directly</button>
+      </p>
+    </div>
   
   <script type="text/javascript">
     'use strict';
@@ -311,6 +321,7 @@
       document.getElementById("regex-pattern").value = regexPatterns.all;
 
       document.getElementById("gen-osm-change").onclick = dlOsmChange;
+      document.getElementById("login").onclick = getUserInfo;
       document.getElementById("upload-osm-change").onclick = function() {
         if (window.confirm('By uploading this data you take responsibility for the changes (and errors) of this tool.')) uploadOsmChange();
       }
@@ -699,16 +710,27 @@
       var changesetString = genChangeset();
       console.log(changesetString);
 
-      osmOAuth.xhr({
-        method: 'GET',
-        path: '/api/0.6/user/details'
-      }, function(err, details) {
-        console.log(details);
-      });
+
 
       var osmChangeString = genOsmChange();
 
 
+    }
+
+    function getUserInfo() {
+      osmOAuth.xhr({
+        method: 'GET',
+        path: '/api/0.6/user/details'
+      }, function(err, data) {
+        parser = new DOMParser();
+        detailsXML = parser.parseFromString(text, data);
+        userElem.getElementByTagName('user')[0];
+
+        var display_name = userElem.getAttribute('display_name');
+        var id = userElem.getAttribute('id');
+
+        document.getElementById('user-details').innerHTML = 'Logged in as ' + display_name + ', user id ' + id;
+      });
     }
   </script>
   </body>
