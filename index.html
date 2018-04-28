@@ -700,7 +700,7 @@
       console.log(changesetString);
 
       osmOAuth.xhr({
-        method: 'PUT',
+        method: 'GET',
         path: '/api/0.6/user/details'
       }, function(err, details) {
         console.log(details);
