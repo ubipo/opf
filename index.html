@@ -723,7 +723,7 @@
         path: '/api/0.6/user/details'
       }, function(err, data) {
         var parser = new DOMParser();
-        var detailsXML = parser.parseFromString(text, data);
+        var detailsXML = parser.parseFromString(data, "text/xml");
         var userElem = detailsXML.getElementByTagName('user')[0];
 
         var display_name = userElem.getAttribute('display_name');
