@@ -20,6 +20,9 @@
         -moz-osx-font-smoothing: grayscale;
         color: #344d50;
       }
+      p {
+        max-width: 40em;
+      }
       table, td, th {
         border: 1px solid #344d50;
         white-space: nowrap;
@@ -102,13 +105,15 @@
 
   </head>
   <body>
-    <h1 class="tagline">OPF - OSM Phone Formatter</h1>
+    <h1 class="tagline">OPF - OSM Phone Formatter | WIP</h1>
     <p>
-      Easily fix the formatting of phone and fax numbers on OpenStreetMap. <br>
+      Easily fix the formatting of phone and fax numbers on OpenStreetMap.<br>
       version <span id="version"></span>
     </p>
 
     <p>Follow the steps below to format phone numbers in your area. This tool is not perfect and may not format all numbers correctly - the edits you upload with OPF are still your edits.</p>
+
+    <p>Found something to improve? Report it or file a pull request on <a href="https://github.com/ubipo/opf">github</a>.</p>
 
     <h2 class="tagline">Step 1: get data</h2>
     <p>Fetch suspicious data from the overpass API.</p>
@@ -153,9 +158,12 @@
     <h2>Step 2: format data</h2>
 
     <p>
-      Use the button below to format the data fetched from the overpass API using libphonenumber-js.
-      First check and correct the data (you can edit it in the 'final' column).
+      Use the button below to format the data fetched from the overpass API.
+      First check and correct the data (you can edit it in the 'formatted' column).
+      <br><span style="color: red">Manually editing the formatted version doesn't work yet!</span><br>
       When an entry looks right, click the 'checked' column on that entry. You can also click the column header to toggle all entries at once.
+    </p>
+    <p>
       Entries that aren't checked won't be modified in the final upload or .osm download.
       If not a single number of an element was modified, the entire element is skipped.
     </p>
