@@ -167,6 +167,8 @@
       Entries that aren't checked won't be modified in the final upload or .osm download.
       If not a single number of an element was modified, the entire element is skipped.
     </p>
+    <input id="country-code" type="text" name="country-code" value="BE">
+    <label for="country-code"><a href="https://en.wikipedia.org/wiki/List_of_country_calling_codes">Country code</a> to assume when formatting</label>
     <button id="format-data">Format</button><br>
     <table id="opfData">
       <colgroup>
@@ -531,10 +533,12 @@
       if (formatted)
         deleteFormatData();
       formatted = true;
-      var tableBody = document.getElementById("opfData").getElementsByTagName('tbody')[0];
+
+      var countryCode = document.getElementById('country-code').value;
+      var tableBody = document.getElementById('opfData').getElementsByTagName('tbody')[0];
       for (var elem of opfData) {
         if (!elem.mainKey) {
-          let numFormatted = libphonenumber.formatNumber({phone: cleanPrefix(elem.numOriginal), country: 'BE'}, 'International');
+          let numFormatted = libphonenumber.formatNumber({phone: cleanPrefix(elem.numOriginal), country: countryCode}, 'International');
           elem['numFormatted'] = numFormatted;
           elem['checked'] = false;
           var row = tableBody.querySelector('[index="'+elem.index+'"][subIndex="'+elem.subIndex+'"]');
