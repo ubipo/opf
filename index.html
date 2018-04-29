@@ -111,7 +111,7 @@
     <p>Follow the steps below to format phone numbers in your area. This tool is not perfect and may not format all numbers correctly - the edits you upload with OPF are still your edits.</p>
 
     <h2 class="tagline">Step 1: get data</h2>
-    <p>Fetch suspicsious data from the overpass API.</p>
+    <p>Fetch suspicious data from the overpass API.</p>
 
     <form id="query-form">
       <div id="b-box-map"></div>
@@ -154,8 +154,8 @@
 
     <p>
       Use the button below to format the data fetched from the overpass API using libphonenumber-js.
-      First check and correct the data (you can edit it in the 'final' collumn).
-      When an entry looks right, click the 'checked' collumn on that entry. You can also click the collumn header to toggle all entries at once.
+      First check and correct the data (you can edit it in the 'final' column).
+      When an entry looks right, click the 'checked' column on that entry. You can also click the column header to toggle all entries at once.
       Entries that aren't checked won't be modified in the final upload or .osm download.
       If not a single number of an element was modified, the entire element is skipped.
     </p>
@@ -192,6 +192,7 @@
         <a id="osm-change-dl"></a>
       </p>
       <p>
+        <span style="color: red">Automatic uploads do not work yet! You can use <a href="https://wiki.openstreetmap.org/wiki/Upload.py">upload.py</a> in the meantime.</span>
         <button id="login">Login</button>
         <span id="user-details"></span>
         <button id="upload-osm-change">Upload changes to OSM</button>
@@ -253,7 +254,7 @@
       };
     }
 
-    var opfVersion = 0.2;
+    var opfVersion = 0.3;
 
     var defaultBBox = [[50.8762690879832,4.695570588046395],[50.882964426809274,4.7061771154403695]];
 
@@ -292,10 +293,11 @@
       document.getElementById("toggle-advanced-options").onclick = function(e) {
         showAdvancedOptions = !showAdvancedOptions;
         var advancentOptions = document.getElementsByClassName('advanced-options');
-        
-        var hiddenClassAction;
-        e.target.innerHTML, hiddenClassAction = showAdvancedOptions ? ('Show advanced options', 'remove') : ('Hide advanced options', 'add');
 
+        var buttonVerb = showAdvancedOptions ? 'Hide' : 'Show';
+        var hiddenClassAction = showAdvancedOptions ? 'remove' : 'add';
+
+        e.target.innerHTML = `${buttonVerb} advanced options`
         for (var advancentOption of advancentOptions) {
           advancentOption.classList[hiddenClassAction]('hidden');
         }  
@@ -306,14 +308,16 @@
         recalculateQuery(e);
       };
       document.getElementById("overpass-fetch").onclick = function(e) {
-        if (!opfData.length || window.confirm('This will overwrite all data below. Are you sure?'))
+        if (!opfData.length || window.confirm('This will overwrite all data below. Are you sure?')) {
           e.target.setAttribute('disabled', 'true');
           fetchOverpassData(recalculateQuery());
+        }
       };
       document.getElementById("format-data").onclick = function(e) {
-        if (!formatted || window.confirm('This will overwrite all already formatted data below. Are you sure?'))
+        if (!formatted || window.confirm('This will overwrite all already formatted data below. Are you sure?')) {
           e.target.setAttribute('disabled', 'true');
           formatData();
+        }
       };
       document.getElementById("checked-header").onclick = toggleCheckedAll;
       document.getElementById("regex-picker").onchange = regexPicked;
@@ -397,7 +401,7 @@
         bBoxCoordsElem.innerHTML += prefix + sides[i] + ':&nbsp;' + roundAfterComma(bBoxCoords.slice(i,i+1), 5);
         prefix = '&emsp;'
       }
-      document.getElementById('b-box-wha').innerHTML = 'Width:&nbsp;' + width + 'm&emsp;Height:&nbsp;' + height + 'm&emsp;Area:&nbsp;' + area + 'm&sup2;';
+      document.getElementById('b-box-wha').innerHTML = `Width:&nbsp;${width}m&emsp;Height:&nbsp;${height}m&emsp;Area:&nbsp;${area}m&sup2;`;
     }
 
     var regexPicked = function(e) {
@@ -518,14 +522,15 @@
 
       if (formatted)
         deleteFormatData();
+      formatted = true;
       var tableBody = document.getElementById("opfData").getElementsByTagName('tbody')[0];
       for (var elem of opfData) {
         if (!elem.mainKey) {
-          formatted = libphonenumber.formatNumber({phone: cleanPrefix(elem.numOriginal), country: 'BE'}, 'International');
-          elem['numFormatted'] = formatted;
+          let numFormatted = libphonenumber.formatNumber({phone: cleanPrefix(elem.numOriginal), country: 'BE'}, 'International');
+          elem['numFormatted'] = numFormatted;
           elem['checked'] = false;
           var row = tableBody.querySelector('[index="'+elem.index+'"][subIndex="'+elem.subIndex+'"]');
-          appendToTableRow(row, formatted, ['formatted'], [{name: 'contentEditable', value: 'true'}]);
+          appendToTableRow(row, numFormatted, ['formatted'], [{name: 'contentEditable', value: 'true'}]);
           appendToTableRow(row, elem.checked, ['checked-state'], []);
         }
       }
@@ -552,8 +557,8 @@
     var deleteFormatData = function() {
       checkedAll = false;
       formatted = false;
-      elems = [].concat(Array.from(document.getElementsByClassName('formatted')), Array.from(document.getElementsByClassName('checked-state')));
-      for (elem of elems) {
+      var elems = [].concat(Array.from(document.getElementsByClassName('formatted')), Array.from(document.getElementsByClassName('checked-state')));
+      for (var elem of elems) {
         elem.parentNode.removeChild(elem);
       }
     }
