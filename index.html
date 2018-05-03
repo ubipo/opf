@@ -266,7 +266,14 @@
 
     var opfVersion = 0.3;
 
-    var defaultBBox = [[50.8762690879832,4.695570588046395],[50.882964426809274,4.7061771154403695]];
+    var retrievedObject = JSON.parse( localStorage.getItem( 'defaultlocation' ) );
+    var defaultBBox =  null;
+
+    if ( retrievedObject ) {
+        defaultBBox = L.latLng( retrievedObject.lat, retrievedObject.lon).toBounds(1000);
+    } else {
+        defaultBBox = [[50.8762690879832,4.695570588046395],[50.882964426809274,4.7061771154403695]];
+    }
 
     var bBoxCoords;
 
@@ -371,6 +378,12 @@
           circlemarker: false
         }
       });
+        
+      if (retrievedObject) {
+          if (retrievedObject.zoom) {
+              bBoxMap.setZoom(retrievedObject.zoom);
+          }
+      }
 
       var bBox = L.rectangle(defaultBBox);
       bBox.addTo(drawnItems);
@@ -387,6 +400,17 @@
         drawnItems.addLayer(layer);
 
         updateBBoxInfo(layer._defaultShape());
+      });
+
+      // move to the last known area we dragged
+      bBoxMap.on('moveend', function(event) {
+        var latlng = this.getBounds().getCenter();
+        var setObject = {
+            'lat': latlng.lat,
+            'lon': latlng.lng,
+            'zoom': this.getZoom()
+        };
+        localStorage.setItem( 'defaultlocation', JSON.stringify( setObject ) );
       });
 
       // Object(s) edited - update popups
