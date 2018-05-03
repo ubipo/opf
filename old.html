@@ -12,80 +12,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css" integrity="sha256-pMhcV6/TBDtqH9E9PWKgS+P32PVguLG8IipkPyqMtfY=" crossorigin="anonymous" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js" integrity="sha256-XWzSUJ+FIQ38dqC06/48sNRwU1Qh3/afjmJ080SneA8=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/osm-auth@1.0.2/osmauth.min.js" crossorigin="anonymous"></script>
-<!--     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
-    <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script> -->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
 
     <style type="text/css">
-      .hidden {
-        display: none;
-      }
-      .leaflet-control-custom {
-        background-color: white;
-        cursor: pointer;
-        width: 30px;
-        height: 30px;
-      }
-      .leaflet-bar.disabled, .leaflet-bar button.disabled {
-        cursor: default;
-        pointer-events: none;
-        opacity: .6;
-      }
-      .l-btn-icon-cont {
-        display: inline-block;
-        text-align: center;
-      }
-      .l-btn-icon-cont:before {
-        content: '';
-        display: inline-block;
-        height: 100%;
-        vertical-align: middle;
-      }
-      .l-btn-icon {
-        font-size: 15px;
-        margin: auto;
-        text-align: center;
-        vertical-align: middle;
-      }
-      .overlay {
-        position: absolute;
-        z-index: 3000;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-color: rgba(255, 255, 255, 0.7);
-      }
-      .overlay-content {
-        margin-top: 5em;
-        margin-left: 7em;
-      }
-      .overlay h1, .overlay h2, .overlay p {
-        font-family: Avenir,Helvetica,Arial,sans-serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        color: #344d50;
-      }
-      .tagline {
-        margin-bottom: 2px;
-      }
-      .tagline+p {
-        margin-top: 0;
-        font-style: italic;
-      }
-      #overlay-welcome-close {
-        position: absolute;
-        cursor: pointer;
-        top: 20px;
-        right: 20px;
-      }
-
-/*      .overlay h1 {
-        font-size: 20px;
-      }*/
-      
-/*    .overlay h1, h2, p, label, #query-form .b-box-info, table, td, th {
+      h1, h2, p, label, #query-form .b-box-info, table, td, th {
         font-family: Avenir,Helvetica,Arial,sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
@@ -100,23 +29,25 @@
       }
       table {
         border-collapse: collapse;
-      }*/
-      body {
-        margin: 0;
-        position: relative;
       }
-/*      .tagline {
+      @media only screen and (min-width: 40em) {
+        body {
+          margin-top: 6vh;
+          margin-left: 6vw;
+        }
+      }
+      .tagline {
         margin-bottom: 2px;
       }
       .tagline+p {
         margin-top: 0;
         font-style: italic;
-      }*/
-      #map {
-        width: 100vw;
-        height: 100vh;
       }
-/*      #toggle-advanced-options {
+      #b-box-map {
+        height: 30em;
+        max-width: 40em;
+      }
+      #toggle-advanced-options {
         margin-top: 0.3em;
         margin-bottom: 0.7em;
       }
@@ -169,29 +100,12 @@
       }
       #data-actions button, span {
         margin-bottom: 0.3em;
-      }*/
+      }
     </style>
 
   </head>
   <body>
-    <div class="overlay hidden" id="overlay-welcome">
-      <div class="overlay-content">
-        <i id="overlay-welcome-close" class="fas fa-times-circle fa-lg"></i>
-        <p><a href="/old.html">Use the old (functional) version of OPF</a></p>
-        <h1 class="tagline">OPF - OSM Phone Formatter</h1>
-        <p>
-          Easily fix the formatting of phone and fax numbers on OpenStreetMap<br>
-          Beta - version <span id="version">...</span>
-        </p>
-
-        <p>
-          Guide
-        </p>
-      </div>
-    </div>
-    <div id="map"></div>
-
-<!--     <h1 class="tagline">OPF - OSM Phone Formatter | WIP</h1>
+    <h1 class="tagline">OPF - OSM Phone Formatter | WIP</h1>
     <p>
       Easily fix the formatting of phone and fax numbers on OpenStreetMap.<br>
       version <span id="version"></span>
@@ -205,7 +119,7 @@
     <p>Fetch suspicious data from the overpass API.</p>
 
     <form id="query-form">
-      
+      <div id="b-box-map"></div>
       <span id="b-box-coords" class="b-box-info"></span>
       <span id="b-box-wha" class="b-box-info"></span>
       <button id="toggle-advanced-options" type="button">Show advanced options</button>
@@ -250,7 +164,7 @@
       When an entry looks right, click the 'checked' column on that entry. You can also click the column header to toggle all entries at once.
     </p>
     <p>
-      Entries that aren't checked won't be modified in the final upload or .osm download.
+      Entries that aren't checked won't be modified in the final upload or .osc download.
       If not a single number of an element was modified, the entire element is skipped.
     </p>
     <input id="country-code" type="text" name="country-code" value="BE">
@@ -258,9 +172,9 @@
     <button id="format-data">Format</button><br>
     <table id="opfData">
       <colgroup>
-        <col span="1" style="width: 1em;">
+<!--         <col span="1" style="width: 1em;">
         <col span="1" style="width: 7em;">
-        <col span="1" style="width: 6em;">
+        <col span="1" style="width: 6em;"> -->
       </colgroup>
 
       <thead>
@@ -293,7 +207,7 @@
         <span id="user-details"></span>
         <button id="upload-osm-change">Upload changes to OSM</button>
       </p>
-    </div> -->
+    </div>
   
   <script type="text/javascript">
     'use strict';
@@ -350,30 +264,26 @@
       };
     }
 
-    function bid(el) {
-      return document.getElementById(el)
-    };
+    var opfVersion = 0.3;
 
-    var opfVersion = 1.1; // Tool version
-    var defaultBBox = [[50.8762690879832,4.695570588046395],[50.882964426809274,4.7061771154403695]];
+    var retrievedObject = JSON.parse( localStorage.getItem( 'defaultlocation' ) );
+    var defaultBBox =  null;
+
+    if ( retrievedObject ) {
+        defaultBBox = L.latLng( retrievedObject.lat, retrievedObject.lon).toBounds(1000);
+    } else {
+        defaultBBox = [[50.8762690879832,4.695570588046395],[50.882964426809274,4.7061771154403695]];
+    }
+
     var bBoxCoords;
+
     var formatted = false;
+
     var checkedAll = false;
+
     var showAdvancedOptions = false;
-    var opfData = [];
-    var map;
-    var prevBounds;
 
-    var refreshState = 'enabled'; // Either 'enabled', 'disabled' or 'busy'
-    var minRefreshDelta = 3000;
-    var refreshScheduled; // When true, refreshes data as soon as ready
-
-    var mapDeltaTimeout; // Timeout to trigger auto refresh check
-    var minMapDelta = 0.002; // Mininimum movement to trigger auto refresh (decimal degrees)
-    var minZoomLevel = 16;
-
-    var zoomDisableScheduled = false;
-
+    var opfData = []
 
     var regexPatterns = {
       all: ".",
@@ -393,310 +303,123 @@
       auto: true
     });
 
-    var overlayShown = false;
-
-    function toggleWelcomeOverlay(state) {
-      overlayShown = state || !overlayShown; // Set new state, either by arg or inversing prev
-      var action = overlayShown ? 'remove' : 'add'; // Reversed logic
-      document.getElementById('overlay-welcome').classList[action]('hidden');
-    }
-
-    function cookieCheckWelcomeOverlay() {
-      if (!Cookies.get('visited')) {
-        toggleWelcomeOverlay(true);
-      }
-    }
-
-    function flattenObject(ob) {
-      var toReturn = [];
-      
-      for (var i in ob) {
-        if (!ob.hasOwnProperty(i)) continue;
-        
-        if ((typeof ob[i]) == 'object' && ob[i] !== null) {
-          var flatObject = flattenObject(ob[i]);
-          for (var x in flatObject) {
-            if (flatObject.hasOwnProperty(x))
-              toReturn.push(flatObject[x]);
-          }
-        } else {
-          toReturn.push(ob[i]);
-        }
-      }
-
-      return toReturn;
-    };
-
     document.addEventListener('DOMContentLoaded', init, false);
 
     function init() {
-      bid('version').innerHTML = opfVersion;
+      document.getElementById('version').innerHTML = opfVersion;
+      document.getElementById("toggle-advanced-options").onclick = function(e) {
+        showAdvancedOptions = !showAdvancedOptions;
+        var advancentOptions = document.getElementsByClassName('advanced-options');
 
-      cookieCheckWelcomeOverlay();
+        var buttonVerb = showAdvancedOptions ? 'Hide' : 'Show';
+        var hiddenClassAction = showAdvancedOptions ? 'remove' : 'add';
 
+        e.target.innerHTML = `${buttonVerb} advanced options`
+        for (var advancentOption of advancentOptions) {
+          advancentOption.classList[hiddenClassAction]('hidden');
+        }  
+      };
 
-      bid('overlay-welcome-close').onclick = () => {toggleWelcomeOverlay(false);};
-      // document.getElementById("toggle-advanced-options").onclick = function(e) {
-      //   showAdvancedOptions = !showAdvancedOptions;
-      //   var advancentOptions = document.getElementsByClassName('advanced-options');
+      document.getElementById("query-recalculate").onclick = function(e) {
+        e.preventDefault();
+        recalculateQuery(e);
+      };
+      document.getElementById("overpass-fetch").onclick = function(e) {
+        if (!opfData.length || window.confirm('This will overwrite all data below. Are you sure?')) {
+          e.target.setAttribute('disabled', 'true');
+          fetchOverpassData(recalculateQuery());
+        }
+      };
+      document.getElementById("format-data").onclick = function(e) {
+        if (!formatted || window.confirm('This will overwrite all already formatted data below. Are you sure?')) {
+          e.target.setAttribute('disabled', 'true');
+          formatData();
+        }
+      };
+      document.getElementById("checked-header").onclick = toggleCheckedAll;
+      document.getElementById("regex-picker").onchange = regexPicked;
+      document.getElementById("regex-pattern").oninput = regexChanged;
+      document.getElementById("regex-pattern").value = regexPatterns.all;
 
-      //   var buttonVerb = showAdvancedOptions ? 'Hide' : 'Show';
-      //   var hiddenClassAction = showAdvancedOptions ? 'remove' : 'add';
-
-      //   e.target.innerHTML = `${buttonVerb} advanced options`
-      //   for (var advancentOption of advancentOptions) {
-      //     advancentOption.classList[hiddenClassAction]('hidden');
-      //   }  
-      // };
-
-      // document.getElementById("query-recalculate").onclick = function(e) {
-      //   e.preventDefault();
-      //   recalculateQuery(e);
-      // };
-      // document.getElementById("overpass-fetch").onclick = function(e) {
-      //   if (!opfData.length || window.confirm('This will overwrite all data below. Are you sure?')) {
-      //     e.target.setAttribute('disabled', 'true');
-      //     fetchOverpassData(recalculateQuery());
-      //   }
-      // };
-      // document.getElementById("format-data").onclick = function(e) {
-      //   if (!formatted || window.confirm('This will overwrite all already formatted data below. Are you sure?')) {
-      //     e.target.setAttribute('disabled', 'true');
-      //     formatData();
-      //   }
-      // };
-      // document.getElementById("checked-header").onclick = toggleCheckedAll;
-      // document.getElementById("regex-picker").onchange = regexPicked;
-      // document.getElementById("regex-pattern").oninput = regexChanged;
-      // document.getElementById("regex-pattern").value = regexPatterns.all;
-
-      // document.getElementById("gen-osm-change").onclick = dlOsmChange;
-      // document.getElementById("login").onclick = getUserInfo;
-      // document.getElementById("upload-osm-change").onclick = function() {
-      //   if (window.confirm('By uploading this data you take responsibility for the changes (and errors) of this tool.')) uploadOsmChange();
-      // }
+      document.getElementById("gen-osm-change").onclick = dlOsmChange;
+      document.getElementById("login").onclick = getUserInfo;
+      document.getElementById("upload-osm-change").onclick = function() {
+        if (window.confirm('By uploading this data you take responsibility for the changes (and errors) of this tool.')) uploadOsmChange();
+      }
 
       initLeaflet();
     }
 
     function initLeaflet() {
-      map = L.map('map', {
-        maxZoom: 18
-      });
+      var bBoxMap = L.map('b-box-map');
       var osm = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map);
+      }).addTo(bBoxMap);
+      // FeatureGroup is to store editable layers
+      var drawnItems = new L.FeatureGroup();
+      drawnItems.addTo(bBoxMap);
 
-      // L.easyButton('fas fa-info', function(btn, map){
-      //     welcomeOverlay();
-      // }).addTo(map);
-
-      var infoButton = L.Control.extend({
-        options: {
-          position: 'topleft' 
+      var drawControl = new L.Control.Draw({
+        edit: {
+          featureGroup: drawnItems,
+          remove: false
         },
-        onAdd: function(map) {
-          var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom l-btn-icon-cont');
-          container.ondblclick = (e) => {e.stopPropagation();};
-          container.onclick = () => {
-            toggleWelcomeOverlay(true);
-            Cookies.set('visited', 'true');
-          };
-          var icon = L.DomUtil.create('i', 'l-btn-icon fas fa-info', container);
-          return container;
+        draw: {
+          featureGroup: drawnItems,
+          rectangle: {
+            enable: true,
+            showArea:true,
+            metric: ['km', 'm']
+          },
+          polygon: false,
+          marker: false,
+          circle: false,
+          polyline: false,
+          circlemarker: false
         }
       });
-
-      var refreshButton = L.Control.extend({
-        options: {
-          position: 'topright' 
-        },
-        onAdd: function(map) {
-          var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom l-btn-icon-cont l-btn-refresh');
-          container.ondblclick = (e) => {e.stopPropagation();};
-          container.onclick = () => {
-            refresh();
-          };
-          var icon = L.DomUtil.create('i', 'l-btn-icon fas fa-sync-alt', container);
-          return container;
-        }
-      });
-
-      map.addControl(new infoButton());
-      map.addControl(new refreshButton());
-
-      // var drawnItems = new L.FeatureGroup();
-      // drawnItems.addTo(bBoxMap);
-
-      // var drawControl = new L.Control.Draw({
-      //   edit: {
-      //     featureGroup: drawnItems,
-      //     remove: false
-      //   },
-      //   draw: {
-      //     featureGroup: drawnItems,
-      //     rectangle: {
-      //       enable: true,
-      //       showArea:true,
-      //       metric: ['km', 'm']
-      //     },
-      //     polygon: false,
-      //     marker: false,
-      //     circle: false,
-      //     polyline: false,
-      //     circlemarker: false
-      //   }
-      // });
-
-      // var bBox = L.rectangle(defaultBBox);
-      // bBox.addTo(drawnItems);
-      // updateBBoxInfo(bBox.getLatLngs()[0]);
-      map.fitBounds(defaultBBox);
-
-      prevBounds = flattenObject(map.getBounds());
-
-      map.on('move', function(e) {
-        window.clearTimeout(mapDeltaTimeout);
-        mapDeltaTimeout = window.setTimeout(testMapDelta, 500);
-      });
-
-      map.on("zoomend", function(e) {
-        testMinZoom();
-      });
-
-      // bBoxMap.addControl(drawControl);
-
-      // bBoxMap.on('draw:created', function(event) {
-      //   var layer = event.layer;
-      //   drawnItems.eachLayer(function(layer) {
-      //     drawnItems.removeLayer(layer);
-      //   });  
-      //   drawnItems.addLayer(layer);
-
-      //   updateBBoxInfo(layer._defaultShape());
-      // });
-
-      // // Object(s) edited - update popups
-      // bBoxMap.on('draw:edited', function(event) {
-      //   var layers = event.layers;
-      //   layers.eachLayer(function(layer) {
-      //     updateBBoxInfo(layer._defaultShape())
-      //   });
-      // });
-    }
-
-    function testMapDelta() {
-      if (testMinZoom()) {
-        var newBounds = flattenObject(map.getBounds());
-
-        for (var i = 0; i < newBounds.length; i++) {
-          if (Math.abs(newBounds[i] - prevBounds[i]) >= minMapDelta) {
-            console.log('Bounds changed, auto refreshing...')
-            prevBounds = newBounds;
-            refresh();
-            break;
+        
+      if (retrievedObject) {
+          if (retrievedObject.zoom) {
+              bBoxMap.setZoom(retrievedObject.zoom);
           }
-        }
       }
-    }
 
-    function testMinZoom() {
-      if (map.getZoom() < minZoomLevel) {
-        if (refreshState == 'enabled') {
-          zoomDisableScheduled = false;
-          setRefreshState('disabled');
-        } else {
-          zoomDisableScheduled = true;
-        }
-        return false;
-      } else {
-        if (refreshState == 'disabled') {
-          setRefreshState('enabled');
-        }
-        return true;
-      }
-    }
+      var bBox = L.rectangle(defaultBBox);
+      bBox.addTo(drawnItems);
+      updateBBoxInfo(bBox.getLatLngs()[0]);
+      bBoxMap.fitBounds(defaultBBox);
 
-    function refresh() {
-      if (refreshState == 'enabled') {
-        setRefreshState('busy');
-        refreshScheduled = false;
-        console.log('Starting refresh...')
-        window.setTimeout(() => {
-          console.log('Refresh done!')
-          setRefreshState('timeout');
-          console.log('Overpass API stress timeout started...')
-          window.setTimeout(enableRefreshTimeoutEnd, minRefreshDelta);
-        }, 2000);
-      } else {
-        refreshScheduled = true;
-      }
-      // if (delta >= minRefreshDelta) {
-      //   prevRefreshTime = newTime;
-      //   bid('map').getElementsByClassName('l-btn-refresh')[0].classList.add('disabled');
-      //   console.log('Getting data!');
-      // } else {
-      //   var wait = minRefreshDelta - timeDelta + 50;
-      //   console.log(`Watiting ${wait}ms before refreshing`);
-      //   window.clearTimeout(nextRefreshTimeout);
-      //   enableRefreshTimeout = window.setTimeout(getData, minRefreshDelta - timeDelta + 50);
-      // }
-    }
+      bBoxMap.addControl(drawControl);
 
-    function enableRefreshTimeoutEnd() {
-      console.log('Overpass API stress timeout ended')
-      setRefreshState('enabled');
-      if (refreshScheduled) refresh();
-    }
+      bBoxMap.on('draw:created', function(event) {
+        var layer = event.layer;
+        drawnItems.eachLayer(function(layer) {
+          drawnItems.removeLayer(layer);
+        });  
+        drawnItems.addLayer(layer);
 
-    function setRefreshState(state) {
-      refreshState = state;
-      if (zoomDisableScheduled && !testMinZoom()) return;
+        updateBBoxInfo(layer._defaultShape());
+      });
 
-      var cont = bid('map').getElementsByClassName('l-btn-refresh')[0]; // Refresh button container
-      var contCl = cont.classList;
-      var iconCl = cont.getElementsByTagName('i')[0].classList;
+      // move to the last known area we dragged
+      bBoxMap.on('moveend', function(event) {
+        var latlng = this.getBounds().getCenter();
+        var setObject = {
+            'lat': latlng.lat,
+            'lon': latlng.lng,
+            'zoom': this.getZoom()
+        };
+        localStorage.setItem( 'defaultlocation', JSON.stringify( setObject ) );
+      });
 
-      switch (refreshState) {
-        case 'enabled':
-          contCl.remove('disabled');
-          iconCl.remove('fa-spin');
-          iconCl.remove('fa-clock');
-          iconCl.remove('far');
-          iconCl.add('fas');
-          iconCl.add('fa-sync-alt');
-          break;
-
-        case 'busy':
-          contCl.add('disabled');
-          iconCl.remove('fa-clock');
-          iconCl.remove('far');
-          iconCl.add('fa-spin');
-          iconCl.add('fa-sync-alt');
-          iconCl.add('fas');
-          break;
-
-        case 'timeout':
-          contCl.add('disabled');
-          iconCl.remove('fa-spin');
-          iconCl.remove('fa-sync-alt');
-          iconCl.remove('fas');
-          iconCl.add('far');
-          iconCl.add('fa-clock');
-          break;
-
-        case 'disabled':
-          contCl.add('disabled');
-          iconCl.remove('fa-clock');
-          iconCl.remove('fa-spin');
-          iconCl.remove('far');
-          iconCl.add('fas');
-          iconCl.add('fa-sync-alt');
-          break;
-
-        default:
-          throw('Invalid refresh state');
-      }
+      // Object(s) edited - update popups
+      bBoxMap.on('draw:edited', function(event) {
+        var layers = event.layers;
+        layers.eachLayer(function(layer) {
+          updateBBoxInfo(layer._defaultShape())
+        });
+      });
     }
 
     var updateBBoxInfo = function(latlngs) {
@@ -938,12 +661,15 @@
 
           // Set static properties
           mainElem.setAttribute('id', opfElem.origElem.id);
-          mainElem.setAttribute('lat', opfElem.origElem.lat);
-          mainElem.setAttribute('lon', opfElem.origElem.lon);
           mainElem.setAttribute('version', opfElem.origElem.version);
 
+          if (opfElem.origElem.type == 'node') {
+            mainElem.setAttribute('lat', opfElem.origElem.lat);
+            mainElem.setAttribute('lon', opfElem.origElem.lon);
+          }
+
           if (opfElem.origElem.members) {
-            for (let member in opfElem.origElem.members) {
+            for (let member of opfElem.origElem.members) {
               let memberElem = osmChange.createElement('member');
               memberElem.setAttribute('type', member.type);
               memberElem.setAttribute('ref', member.ref);
@@ -1020,7 +746,7 @@
       var osmChangeString = genOsmChange();
       var dlLink = document.getElementById('osm-change-dl');
       dlLink.setAttribute('href', 'data:application/xml;charset=utf-8,' + encodeURIComponent(osmChangeString));
-      dlLink.setAttribute('download', 'opf.osm');
+      dlLink.setAttribute('download', 'opf.osc');
       dlLink.innerHTML = 'opf.ocs';
     }
 
