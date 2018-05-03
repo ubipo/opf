@@ -16,6 +16,7 @@
     <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script> -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/async/2.6.0/async.min.js" integrity="sha256-i8Zwyc50sPdPjLglUQb0hNrptUa60QKEYxGDfZR0Efg=" crossorigin="anonymous"></script>
 
     <style type="text/css">
       .hidden {
@@ -355,7 +356,7 @@
     };
 
     var opfVersion = 1.1; // Tool version
-    var defaultBBox = [[50.8762690879832,4.695570588046395],[50.882964426809274,4.7061771154403695]];
+    var defaultBBox = [[50.88081821539843, 4.706557989120484], [50.87751134170449, 4.696494340896607]];
     var bBoxCoords;
     var formatted = false;
     var checkedAll = false;
@@ -384,7 +385,7 @@
       start: "[out:json][timeout:30];\n(\n",
       elems: ["node", "way", "relation"],
       keys: ['phone', 'fax', 'contact:phone', 'contact:fax'],
-      end: ");\nout meta;"
+      end: ");\nout meta center;"
     }
 
     var osmOAuth = osmAuth({
@@ -621,13 +622,21 @@
       if (refreshState == 'enabled') {
         setRefreshState('busy');
         refreshScheduled = false;
-        console.log('Starting refresh...')
-        window.setTimeout(() => {
+        console.log('Starting refresh...');
+        fetchOverpassData(recalculateQuery()).then((data) => {
+          console.log(data);
+          drawElements(data);
           console.log('Refresh done!')
           setRefreshState('timeout');
           console.log('Overpass API stress timeout started...')
           window.setTimeout(enableRefreshTimeoutEnd, minRefreshDelta);
-        }, 2000);
+        });
+        // window.setTimeout(() => {
+        //   console.log('Refresh done!')
+        //   setRefreshState('timeout');
+        //   console.log('Overpass API stress timeout started...')
+        //   window.setTimeout(enableRefreshTimeoutEnd, minRefreshDelta);
+        // }, 2000);
       } else {
         refreshScheduled = true;
       }
@@ -699,6 +708,18 @@
       }
     }
 
+    function drawElements(elements) {
+      for (let elem of elements) {
+        let coords;
+        if (elem.type == 'node') {
+          coords = [elem.lat, elem.lon];
+        } else {
+          coords = flattenObject(elem.center);
+        }
+        L.marker(coords).addTo(map);
+      }
+    }
+
     var updateBBoxInfo = function(latlngs) {
       bBoxCoords = [latlngs[0]['lat'], latlngs[0]['lng'], latlngs[2]['lat'], latlngs[2]['lng']]
       var height = Math.round(latlngs[0].distanceTo(latlngs[1]));
@@ -729,27 +750,32 @@
     }
 
     var recalculateQuery = function(e) {
-      var fax = document.getElementById('fax').checked;
-      var contactVariants = document.getElementById('contact-variants').checked;
-      var regex = document.getElementById('regex-pattern').value;
+      // var fax = document.getElementById('fax').checked;
+      // var contactVariants = document.getElementById('contact-variants').checked;
+      // var regex = document.getElementById('regex-pattern').value;
+      var regex = "."
+      var latlngs = map.get
+      var bBoxCoords = flattenObject(map.getBounds());
       
       var query = queryParts.start;
 
-      var keys = queryParts.keys.slice(0, 1);
-      if (fax)
-        keys.push(queryParts.keys.slice(1, 2));
-      if (contactVariants)
-        keys.push(queryParts.keys.slice(2, 4));
+      // var keys = queryParts.keys.slice(0, 1);
+      // if (fax)
+      //   keys.push(queryParts.keys.slice(1, 2));
+      // if (contactVariants)
+      //   keys.push(queryParts.keys.slice(2, 4));
 
-      keys.forEach(function(key) {
-        for (var j = 0; j < queryParts.elems.length; j++) {
-          query = query.concat('  ',queryParts.elems[j],'["',key,'"~"',regex,'"](',bBoxCoords.toString(),');\n');
+      var keys = queryParts.keys;
+
+      for (var key of keys) {
+        for (var elemType of queryParts.elems) {
+          query = query.concat('  ',elemType,'["',key,'"~"',regex,'"](',bBoxCoords.toString(),');\n');
         }
-      });
+      };
 
       query = query.concat(queryParts.end)
 
-      document.getElementById('query').innerHTML = query.replace(/ /g, '&nbsp').replace(/(?:\r\n|\r|\n)/g, '<br />');
+      // document.getElementById('query').innerHTML = query.replace(/ /g, '&nbsp').replace(/(?:\r\n|\r|\n)/g, '<br />');
 
       return query;
     }
@@ -795,36 +821,31 @@
       document.getElementById('overpass-fetch').removeAttribute('disabled');
     }
 
-    var fetchOverpassData = function(query) {
-      console.log('Fetching overpass data...');
-      NProgress.start();
-      NProgress.set(0.4);
+    function fetchOverpassData(query) {
+      return new Promise((resolve, reject) => {
+        console.log('Fetching overpass data...');
 
-      deleteData();
+        var req = new XMLHttpRequest();
+        req.open("POST", "https://overpass-api.de/api/interpreter");
+        req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
-      var req = new XMLHttpRequest();
-      req.open("POST", "https://overpass-api.de/api/interpreter");
-      req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-
-      req.onreadystatechange = function() {
-        if (req.readyState == XMLHttpRequest.DONE) {
-          if (req.status == 200) {
-            var json = JSON.parse(req.response)
-            if (json.elements != undefined) {
-              console.log('Fetched overpass data')
-              parseOverpassData(json.elements);
-            }
+        req.onload = function() {
+          var json = JSON.parse(req.response);
+          if (json.elements != undefined) {
+            console.log('Fetched overpass data');
+            resolve(json.elements);
           } else {
-            NProgress.done()
-            document.getElementById('overpass-fetch').removeAttribute('disabled');
-            var msg = 'Overpass request failed: ' + req.status + ': ' + req.statusText;
-            console.error(msg);
-            alert(msg);
+            console.error('Overpass request failed: ' + req.status + ': ' + req.statusText);
+            reject(req);
           }
         }
-      }
 
-      req.send('data='.concat(encodeURIComponent(query)));
+        req.onerror = function() {
+          reject(req.response);
+        }
+
+        req.send('data='.concat(encodeURIComponent(query)));
+      });
     }
 
     var formatData = function() {
