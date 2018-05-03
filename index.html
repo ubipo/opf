@@ -164,7 +164,7 @@
       When an entry looks right, click the 'checked' column on that entry. You can also click the column header to toggle all entries at once.
     </p>
     <p>
-      Entries that aren't checked won't be modified in the final upload or .osm download.
+      Entries that aren't checked won't be modified in the final upload or .osc download.
       If not a single number of an element was modified, the entire element is skipped.
     </p>
     <input id="country-code" type="text" name="country-code" value="BE">
@@ -719,7 +719,7 @@
       var osmChangeString = genOsmChange();
       var dlLink = document.getElementById('osm-change-dl');
       dlLink.setAttribute('href', 'data:application/xml;charset=utf-8,' + encodeURIComponent(osmChangeString));
-      dlLink.setAttribute('download', 'opf.osm');
+      dlLink.setAttribute('download', 'opf.osc');
       dlLink.innerHTML = 'opf.ocs';
     }
 
