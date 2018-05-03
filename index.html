@@ -637,12 +637,15 @@
 
           // Set static properties
           mainElem.setAttribute('id', opfElem.origElem.id);
-          mainElem.setAttribute('lat', opfElem.origElem.lat);
-          mainElem.setAttribute('lon', opfElem.origElem.lon);
           mainElem.setAttribute('version', opfElem.origElem.version);
 
+          if (opfElem.origElem.type == 'node') {
+            mainElem.setAttribute('lat', opfElem.origElem.lat);
+            mainElem.setAttribute('lon', opfElem.origElem.lon);
+          }
+
           if (opfElem.origElem.members) {
-            for (let member in opfElem.origElem.members) {
+            for (let member of opfElem.origElem.members) {
               let memberElem = osmChange.createElement('member');
               memberElem.setAttribute('type', member.type);
               memberElem.setAttribute('ref', member.ref);
