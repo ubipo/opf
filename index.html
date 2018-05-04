@@ -381,10 +381,10 @@
       suspicious: "^\\+[0-9]{2,2}(\\s[0-9]{2,3}){1,10}$"
     }
 
-    var queryParts = {
+    var constants = {
       start: "[out:json][timeout:30];\n(\n",
       elems: ["node", "way", "relation"],
-      keys: ['phone', 'fax', 'contact:phone', 'contact:fax'],
+      numberTags: ['phone', 'fax', 'contact:phone', 'contact:fax'],
       end: ");\nout meta center;"
     }
 
@@ -624,8 +624,8 @@
         refreshScheduled = false;
         console.log('Starting refresh...');
         fetchOverpassData(recalculateQuery()).then((data) => {
-          console.log(data);
-          drawElements(data);
+          console.log(parseOverpassData(data));
+          //drawElements(data);
           console.log('Refresh done!')
           setRefreshState('timeout');
           console.log('Overpass API stress timeout started...')
@@ -757,7 +757,7 @@
       var latlngs = map.get
       var bBoxCoords = flattenObject(map.getBounds());
       
-      var query = queryParts.start;
+      var query = constants.start;
 
       // var keys = queryParts.keys.slice(0, 1);
       // if (fax)
@@ -765,61 +765,88 @@
       // if (contactVariants)
       //   keys.push(queryParts.keys.slice(2, 4));
 
-      var keys = queryParts.keys;
+      var keys = constants.numberTags;
 
       for (var key of keys) {
-        for (var elemType of queryParts.elems) {
+        for (var elemType of constants.elems) {
           query = query.concat('  ',elemType,'["',key,'"~"',regex,'"](',bBoxCoords.toString(),');\n');
         }
       };
 
-      query = query.concat(queryParts.end)
+      query = query.concat(constants.end)
 
       // document.getElementById('query').innerHTML = query.replace(/ /g, '&nbsp').replace(/(?:\r\n|\r|\n)/g, '<br />');
 
       return query;
     }
 
-    var parseOverpassData = function(elements) {
-      var tableBody = document.getElementById("opfData").getElementsByTagName('tbody')[0];
-
+    function parseOverpassData(data) {
       opfData = [];
-      var i = 0;
 
-      for (var elem of elements) {
-        opfData.push({
-          index: i,
-          mainKey: true,
-          origElem: elem
-        });
-        appendToTableBody(tableBody, [
-          i,
-          elem.type.slice(0,1),
-          elem.id
-        ], ['main-elem'], [{name: 'index', 'value': i}]);
-        queryParts.keys.forEach(function(key, j) {
-          if (elem.tags[key]) {
-            opfData.push({
-              index: i,
-              subIndex: j,
-              mainKey: false,
-              key: key,
-              numOriginal: elem.tags[key]
-            });
-            appendToTableBody(tableBody, [
-              '',
-              '',
-              '',
-              key,
-              elem.tags[key]
-            ], ['sub-elem'], [{name: 'index', value: i}, {name: 'subIndex', value: j}]);
+      // Loop over all OSM elements in the overpass dataset
+      for (let origElem of data) {
+        // Create a derived object to store extra data
+        let opfElem = {
+          origElem: origElem,
+          numberTags: []
+        }
+
+        // Append each phone number tag for later formatting
+        for (let tag of constants.numberTags) {
+          if (origElem.tags[tag]) {
+            opfElem.numberTags.push({
+              key: tag,
+              orig: origElem.tags[tag]
+            })
           }
-        });
-        i++;
+        }
+
+        opfData.push(opfElem);
       }
-      NProgress.done()
-      document.getElementById('overpass-fetch').removeAttribute('disabled');
+
+      return opfData;
     }
+
+    // var parseOverpassData = function(elements) {
+    //   var tableBody = document.getElementById("opfData").getElementsByTagName('tbody')[0];
+
+    //   opfData = [];
+    //   var i = 0;
+
+    //   for (var elem of elements) {
+    //     opfData.push({
+    //       index: i,
+    //       mainKey: true,
+    //       origElem: elem
+    //     });
+    //     appendToTableBody(tableBody, [
+    //       i,
+    //       elem.type.slice(0,1),
+    //       elem.id
+    //     ], ['main-elem'], [{name: 'index', 'value': i}]);
+    //     queryParts.keys.forEach(function(key, j) {
+    //       if (elem.tags[key]) {
+    //         opfData.push({
+    //           index: i,
+    //           subIndex: j,
+    //           mainKey: false,
+    //           key: key,
+    //           numOriginal: elem.tags[key]
+    //         });
+    //         appendToTableBody(tableBody, [
+    //           '',
+    //           '',
+    //           '',
+    //           key,
+    //           elem.tags[key]
+    //         ], ['sub-elem'], [{name: 'index', value: i}, {name: 'subIndex', value: j}]);
+    //       }
+    //     });
+    //     i++;
+    //   }
+    //   NProgress.done()
+    //   document.getElementById('overpass-fetch').removeAttribute('disabled');
+    // }
 
     function fetchOverpassData(query) {
       return new Promise((resolve, reject) => {
