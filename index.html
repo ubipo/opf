@@ -17,6 +17,9 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/async/2.6.0/async.min.js" integrity="sha256-i8Zwyc50sPdPjLglUQb0hNrptUa60QKEYxGDfZR0Efg=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.runtime.min.js" integrity="sha256-UoS1yAHj9HqfbFL+oYoF0gkPrJiMK9t4zeciRCafl8I=" crossorigin="anonymous"></script>
+
+    <script src="templates/marker.hbc"></script>
 
     <style type="text/css">
       .hidden {
@@ -364,6 +367,7 @@
     var opfData = [];
     var map;
     var prevBounds;
+    var markerPopup = L.popup();
 
     var refreshState = 'enabled'; // Either 'enabled', 'disabled' or 'busy'
     var minRefreshDelta = 3000;
@@ -484,7 +488,7 @@
       map = L.map('map', {
         maxZoom: 18
       });
-      var osm = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      var osm = L.tileLayer('https://tile.osm.be/osmbe/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
 
@@ -624,8 +628,11 @@
         refreshScheduled = false;
         console.log('Starting refresh...');
         fetchOverpassData(recalculateQuery()).then((data) => {
-          console.log(parseOverpassData(data));
-          //drawElements(data);
+          let parsed = parseOverpassData(data);
+          console.log('Original:');
+          console.log(opfData);
+          console.log(parsed);
+          drawElements(addNewData(parsed));
           console.log('Refresh done!')
           setRefreshState('timeout');
           console.log('Overpass API stress timeout started...')
@@ -711,13 +718,25 @@
     function drawElements(elements) {
       for (let elem of elements) {
         let coords;
-        if (elem.type == 'node') {
-          coords = [elem.lat, elem.lon];
+        if (elem.osmElem.type == 'node') {
+          coords = [elem.osmElem.lat, elem.osmElem.lon];
         } else {
-          coords = flattenObject(elem.center);
+          coords = flattenObject(elem.osmElem.center);
         }
-        L.marker(coords).addTo(map);
+        let marker = L.marker(coords);
+        marker.on('click', openPopup).addTo(map);
       }
+    }
+
+    function openPopup(marker) {
+      var latLng = marker.target._latlng;
+      var html = Handlebars.templates['marker.hbs']({
+        latLng: latLng, 
+        id: marker.target._leaflet_id
+      });
+      markerPopup.setLatLng(latLng).setContent(html).openOn(map);
+      // console.log(html);
+      // console.log(marker);
     }
 
     var updateBBoxInfo = function(latlngs) {
@@ -781,30 +800,52 @@
     }
 
     function parseOverpassData(data) {
-      opfData = [];
+      var parsedData = [];
 
       // Loop over all OSM elements in the overpass dataset
-      for (let origElem of data) {
+      for (let osmElem of data) {
         // Create a derived object to store extra data
         let opfElem = {
-          origElem: origElem,
+          osmElem: osmElem,
           numberTags: []
         }
 
         // Append each phone number tag for later formatting
         for (let tag of constants.numberTags) {
-          if (origElem.tags[tag]) {
+          if (osmElem.tags[tag]) {
             opfElem.numberTags.push({
               key: tag,
-              orig: origElem.tags[tag]
+              orig: osmElem.tags[tag]
             })
           }
         }
 
-        opfData.push(opfElem);
+        parsedData.push(opfElem);
       }
 
-      return opfData;
+      return parsedData;
+    }
+
+    /**
+     * Adds new data to the opf store
+     *
+     * @returns New (non-duplicate) elements added
+     */
+    function addNewData(newData) {
+      var newElems = []; // Registers non-duplicate elements
+      for (let newElem of newData) {
+        let dup = opfData.find(elem => {
+          console.log(elem);
+          return newElem.osmElem.type == elem.osmElem.type && newElem.osmElem.id == elem.osmElem.id
+        });
+        if (!dup) {
+          newElems.push(newElem);
+        } else {
+          console.log('Duplicate!');
+        }
+      }
+      opfData = opfData.concat(newElems);
+      return newElems;
     }
 
     // var parseOverpassData = function(elements) {
