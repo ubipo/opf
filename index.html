@@ -7,8 +7,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/libphonenumber-js/1.1.11/libphonenumber-js.min.js" integrity="sha256-WpMe4MJBE9YQsdLF6GgaKw881rFAOqKEH3Hy+0xj3As=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/leaflet.css" integrity="sha256-iYUgmrapfDGvBrePJPrMWQZDcObdAcStKBpjP3Az+3s=" crossorigin="anonymous" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/leaflet.js" integrity="sha256-CNm+7c26DTTCGRQkM9vp7aP85kHFMqs9MhPEuytF+fQ=" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.css" integrity="sha256-XzD3RpaHPv7lzX9qt+2n1j5cWj48O24KsgaGYpKN8x8=" crossorigin="anonymous" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.js" integrity="sha256-jzmB6xy6L0YPzPeu+ccUiPKp3UE+qRmo5xmq5BbnSv0=" crossorigin="anonymous"></script>
+<!--     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.css" integrity="sha256-XzD3RpaHPv7lzX9qt+2n1j5cWj48O24KsgaGYpKN8x8=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.js" integrity="sha256-jzmB6xy6L0YPzPeu+ccUiPKp3UE+qRmo5xmq5BbnSv0=" crossorigin="anonymous"></script> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css" integrity="sha256-pMhcV6/TBDtqH9E9PWKgS+P32PVguLG8IipkPyqMtfY=" crossorigin="anonymous" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js" integrity="sha256-XWzSUJ+FIQ38dqC06/48sNRwU1Qh3/afjmJ080SneA8=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/osm-auth@1.0.2/osmauth.min.js" crossorigin="anonymous"></script>
@@ -18,6 +18,15 @@
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/async/2.6.0/async.min.js" integrity="sha256-i8Zwyc50sPdPjLglUQb0hNrptUa60QKEYxGDfZR0Efg=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.runtime.min.js" integrity="sha256-UoS1yAHj9HqfbFL+oYoF0gkPrJiMK9t4zeciRCafl8I=" crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.3.0/leaflet.markercluster.js" integrity="sha256-3ojygIn9E2azRCTFNSS+qcVr8FT9yfpol9iG2ZaRz4w=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.3.0/MarkerCluster.css" integrity="sha256-+bdWuWOXMFkX0v9Cvr3OWClPiYefDQz9GGZP/7xZxdc=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.3.0/MarkerCluster.Default.css" integrity="sha256-LWhzWaQGZRsWFrrJxg+6Zn8TT84k0/trtiHBc6qcGpY=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.10/lodash.min.js" integrity="sha256-VKITM616rVzV+MI3kZMNUDoY5uTsuSl1ZvEeZhNoJVk=" crossorigin="anonymous"></script>
+
+    <!-- Leaflet.awesome-markers | https://github.com/lvoogdt/Leaflet.awesome-markers -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.min.js" integrity="sha256-IqiRR5X1QtAdcq5lG4vBB1/WxwrRCkkjno4pfvWyag0=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css" integrity="sha256-EFpFyBbuttUJtoocYzsBnERPWee2JYz4cn5nkUBjW0A=" crossorigin="anonymous" />
 
     <script src="templates/marker.hbc"></script>
 
@@ -366,8 +375,40 @@
     var showAdvancedOptions = false;
     var opfData = [];
     var map;
+    var markers = L.markerClusterGroup();
     var prevBounds;
     var markerPopup = L.popup();
+    var OpfMarker = L.Marker.extend({
+       options: { 
+          opfElem: {}
+       }
+    });
+    var phoneMarkerFormattedBefore = L.AwesomeMarkers.icon({
+      icon: 'phone',
+      prefix: 'fas fa',
+      markerColor: 'blue'
+    });
+    var phoneMarkerFormatted = L.AwesomeMarkers.icon({
+      icon: 'phone',
+      prefix: 'fas fa',
+      markerColor: 'orange'
+    });
+    var phoneMarkerError = L.AwesomeMarkers.icon({
+      icon: 'phone',
+      prefix: 'fas fa',
+      markerColor: 'red'
+    });
+    var phoneMarkerChecked = L.AwesomeMarkers.icon({
+      icon: 'phone',
+      prefix: 'fas fa',
+      markerColor: 'green'
+    });
+    var phoneMarkerFallback = L.AwesomeMarkers.icon({
+      icon: 'phone',
+      prefix: 'fas fa',
+      markerColor: 'cadetblue'
+    });
+
 
     var refreshState = 'enabled'; // Either 'enabled', 'disabled' or 'busy'
     var minRefreshDelta = 3000;
@@ -482,14 +523,14 @@
       // }
 
       initLeaflet();
+      refresh();
     }
 
     function initLeaflet() {
-      map = L.map('map', {
-        maxZoom: 18
-      });
+      map = L.map('map');
       var osm = L.tileLayer('https://tile.osm.be/osmbe/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 18
       }).addTo(map);
 
       // L.easyButton('fas fa-info', function(btn, map){
@@ -503,7 +544,7 @@
         onAdd: function(map) {
           var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom l-btn-icon-cont');
           container.ondblclick = (e) => {e.stopPropagation();};
-          container.onclick = () => {
+          container.onclick = e => {
             toggleWelcomeOverlay(true);
             Cookies.set('visited', 'true');
           };
@@ -519,9 +560,7 @@
         onAdd: function(map) {
           var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom l-btn-icon-cont l-btn-refresh');
           container.ondblclick = (e) => {e.stopPropagation();};
-          container.onclick = () => {
-            refresh();
-          };
+          container.onclick = refresh;
           var icon = L.DomUtil.create('i', 'l-btn-icon fas fa-sync-alt', container);
           return container;
         }
@@ -568,6 +607,8 @@
       map.on("zoomend", function(e) {
         testMinZoom();
       });
+
+      map.addLayer(markers);
 
       // bBoxMap.addControl(drawControl);
 
@@ -626,17 +667,19 @@
       if (refreshState == 'enabled') {
         setRefreshState('busy');
         refreshScheduled = false;
-        console.log('Starting refresh...');
+        console.debug('Starting refresh...');
         fetchOverpassData(recalculateQuery()).then((data) => {
-          let parsed = parseOverpassData(data);
-          console.log('Original:');
-          console.log(opfData);
-          console.log(parsed);
-          drawElements(addNewData(parsed));
-          console.log('Refresh done!')
-          setRefreshState('timeout');
-          console.log('Overpass API stress timeout started...')
-          window.setTimeout(enableRefreshTimeoutEnd, minRefreshDelta);
+          let elems = parseOverpassData(data);
+          let newElems = addNewData(elems);
+          updateMetadata(newElems).then(() => {
+            newElems.forEach(formatElem);
+            newElems.forEach(drawElement);
+
+            console.debug('Refresh done!')
+            setRefreshState('timeout');
+            console.debug('Overpass API stress timeout started...')
+            window.setTimeout(enableRefreshTimeoutEnd, minRefreshDelta);
+          })
         });
         // window.setTimeout(() => {
         //   console.log('Refresh done!')
@@ -660,7 +703,7 @@
     }
 
     function enableRefreshTimeoutEnd() {
-      console.log('Overpass API stress timeout ended')
+      console.debug('Overpass API stress timeout ended')
       setRefreshState('enabled');
       if (refreshScheduled) refresh();
     }
@@ -715,28 +758,43 @@
       }
     }
 
-    function drawElements(elements) {
-      for (let elem of elements) {
-        let coords;
-        if (elem.osmElem.type == 'node') {
-          coords = [elem.osmElem.lat, elem.osmElem.lon];
-        } else {
-          coords = flattenObject(elem.osmElem.center);
-        }
-        let marker = L.marker(coords);
-        marker.on('click', openPopup).addTo(map);
+    function drawElement(elem) {
+      let coords;
+      if (elem.osmElem.type == 'node') {
+        coords = [elem.osmElem.lat, elem.osmElem.lon];
+      } else {
+        coords = flattenObject(elem.osmElem.center);
       }
+
+      let icon;
+      if (elem.formatError) {
+        icon = phoneMarkerError;
+      } else if (elem.checked) {
+        icon = phoneMarkerChecked;
+      } else if (elem.formattedBefore) {
+        icon = phoneMarkerFormattedBefore; // Explicitely formatted before
+      } else if (elem.formattedBefore != undefined) {
+        icon = phoneMarkerFormatted; // Not already formatted before but checked for formatting
+      } else {
+        icon = phoneMarkerFallback;
+      }
+
+      let marker = new OpfMarker(coords, {
+        opfElem: elem,
+        icon: icon
+      });
+      marker.on('click', openPopup);
+      markers.addLayer(marker);
     }
 
     function openPopup(marker) {
       var latLng = marker.target._latlng;
       var html = Handlebars.templates['marker.hbs']({
         latLng: latLng, 
-        id: marker.target._leaflet_id
+        id: marker.target._leaflet_id,
+        osmElem: marker.target.options.opfElem.osmElem
       });
       markerPopup.setLatLng(latLng).setContent(html).openOn(map);
-      // console.log(html);
-      // console.log(marker);
     }
 
     var updateBBoxInfo = function(latlngs) {
@@ -815,7 +873,7 @@
           if (osmElem.tags[tag]) {
             opfElem.numberTags.push({
               key: tag,
-              orig: osmElem.tags[tag]
+              original: osmElem.tags[tag]
             })
           }
         }
@@ -834,18 +892,29 @@
     function addNewData(newData) {
       var newElems = []; // Registers non-duplicate elements
       for (let newElem of newData) {
-        let dup = opfData.find(elem => {
-          console.log(elem);
-          return newElem.osmElem.type == elem.osmElem.type && newElem.osmElem.id == elem.osmElem.id
-        });
+        let dup = opfData.find(elem =>
+          newElem.osmElem.type == elem.osmElem.type && newElem.osmElem.id == elem.osmElem.id
+        );
         if (!dup) {
           newElems.push(newElem);
         } else {
-          console.log('Duplicate!');
+          if (!_.isEqual(dup.osmElem, newElem.osmElem)) {
+            updateElem(dup, newElem);
+            dup['changed'] = true;
+          }
         }
       }
       opfData = opfData.concat(newElems);
       return newElems;
+    }
+
+    /**
+     * Updates an existing elem with new data
+     * Just overwrites the element for now
+     *
+    */
+    function updateElem(elem, newElem) {
+      elem = newElem;
     }
 
     // var parseOverpassData = function(elements) {
@@ -891,7 +960,7 @@
 
     function fetchOverpassData(query) {
       return new Promise((resolve, reject) => {
-        console.log('Fetching overpass data...');
+        console.debug('Fetching overpass data...');
 
         var req = new XMLHttpRequest();
         req.open("POST", "https://overpass-api.de/api/interpreter");
@@ -900,7 +969,7 @@
         req.onload = function() {
           var json = JSON.parse(req.response);
           if (json.elements != undefined) {
-            console.log('Fetched overpass data');
+            console.debug('Fetched overpass data');
             resolve(json.elements);
           } else {
             console.error('Overpass request failed: ' + req.status + ': ' + req.statusText);
@@ -916,35 +985,130 @@
       });
     }
 
-    var formatData = function() {
-      console.log('Formatting overpass data...');
-      NProgress.start()
+    function formatElem(elem) {
+      if (elem.countryCode) {
+        var countryCode = elem.countryCode
+      } else {
+        throw('Element is missing a country code, use updateMetadata() first');
+      }
 
-      if (formatted)
-        deleteFormatData();
-      formatted = true;
-
-      var countryCode = document.getElementById('country-code').value;
-      var tableBody = document.getElementById('opfData').getElementsByTagName('tbody')[0];
-      for (var elem of opfData) {
-        if (!elem.mainKey) {
-          let numFormatted = libphonenumber.formatNumber({phone: cleanPrefix(elem.numOriginal), country: countryCode}, 'International');
-          elem['numFormatted'] = numFormatted;
-          elem['checked'] = false;
-          var row = tableBody.querySelector('[index="'+elem.index+'"][subIndex="'+elem.subIndex+'"]');
-          appendToTableRow(row, numFormatted, ['formatted'], [{name: 'contentEditable', value: 'true'}]);
-          appendToTableRow(row, elem.checked, ['checked-state'], []);
+      var anyFormatError = false; // Tracks if any tag fails to format
+      var anyNotFormattedBefore = false; // Tracks if any tag was not already formatted
+      for (let tag of elem.numberTags) {
+        let formatted = formatNumber(tag.original, countryCode);
+        if (formatted) {
+          tag['formatted'] = formatted;
+          if (formatted == tag.original) {
+            tag['formattedBefore'] = true;
+          } else {
+            anyNotFormattedBefore = true;
+          }
+        } else {
+          console.debug('error')
+          tag['formatError'] = true;
+          anyFormatError = true;
         }
       }
-      for (var cell of tableBody.querySelectorAll('.checked-state')) {
-        cell.addEventListener('click', function(e) {
-          toggleChecked(e.target);
-        });
-      }
 
-      NProgress.done();
-      console.log('Formatted overpass data...');
-      document.getElementById('format-data').removeAttribute('disabled');
+      elem['formatError'] = anyFormatError;
+      elem['formattedBefore'] = !anyNotFormattedBefore;
+
+      return elem;
+
+      // if (!elem.country)
+      //   getCountry(elem);
+
+      // if (formatted)
+      //   deleteFormatData();
+      // formatted = true;
+
+      // var countryCode = document.getElementById('country-code').value;
+      // var tableBody = document.getElementById('opfData').getElementsByTagName('tbody')[0];
+      // for (var elem of opfData) {
+      //   if (!elem.mainKey) {
+      //     let numFormatted = libphonenumber.formatNumber({phone: cleanPrefix(elem.numOriginal), country: countryCode}, 'International');
+      //     elem['numFormatted'] = numFormatted;
+      //     elem['checked'] = false;
+      //     var row = tableBody.querySelector('[index="'+elem.index+'"][subIndex="'+elem.subIndex+'"]');
+      //     appendToTableRow(row, numFormatted, ['formatted'], [{name: 'contentEditable', value: 'true'}]);
+      //     appendToTableRow(row, elem.checked, ['checked-state'], []);
+      //   }
+      // }
+      // for (var cell of tableBody.querySelectorAll('.checked-state')) {
+      //   cell.addEventListener('click', function(e) {
+      //     toggleChecked(e.target);
+      //   });
+      // }
+
+      // NProgress.done();
+      // console.log('Formatted overpass data...');
+      // document.getElementById('format-data').removeAttribute('disabled');
+    }
+
+    /**
+     * Updates an element's metadata (or array of elements' metadata) using the nominatim API
+     *
+     * @returns the updated elem
+     */
+    function updateMetadata(elems) {
+      if (elems instanceof Array) {
+        let requests = elems.map(updateMetadataSingle);
+        return Promise.all(requests);
+      } else {
+        elem = elems;
+        return updateMetadataSingle(elem);
+      }
+    }
+
+    function updateMetadataSingle(elem) {
+      return new Promise((resolve, reject) => {
+        var type = elem.osmElem.type.slice(0, 1).toUpperCase();
+        var id = elem.osmElem.id;
+
+        var req = new XMLHttpRequest();
+        req.open("GET", `https://nominatim.openstreetmap.org/reverse?format=json&osm_type=${type}&osm_id=${id}`);
+
+        req.onload = function() {
+          var metadata = JSON.parse(req.response);
+          var name = metadata.display_name;
+          var code = metadata.address.country_code.toUpperCase();
+          if (metadata.osm_id != undefined) {
+            let name = metadata.display_name;
+            let code = metadata.address.country_code.toUpperCase();
+            elem['name'] = name;
+            elem['countryCode'] = code;
+            resolve(elem);
+          } else {
+            console.error('Overpass request failed: ' + req.status + ': ' + req.statusText);
+            reject(req);
+          }
+        }
+
+        req.onerror = function() {
+          reject(req.response);
+        }
+
+        req.send();
+      });
+    }
+
+    /**
+     * Attempts to format the provided number
+     *
+     * @returns the formatted number if a valid number was provided, false otherwise
+     */
+    function formatNumber(number, country) {
+      // Replace 2 leading zero's with '+' if present (international prefix)
+      if (number.slice(0,2) == '00') 
+        number = spliceSlice(number, 0, 2, '+');
+
+      var parsed = libphonenumber.parseNumber(number, country);
+      if (!_.isEmpty(parsed)) {
+        return libphonenumber.formatNumber(parsed, 'International');
+      } else {
+        console.error(`Couldn\'t parse "${number}" for country "${country}" :(`);
+        return false;
+      }
     }
 
     var deleteData = function() {
