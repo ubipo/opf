@@ -1,5 +1,21 @@
-<h1>{{latLng}}</h1>
-<div class="body">
-  <p>OSM id: {{osmElem.id}}</p>
-  <p>OSM type: {{osmElem.type}}</p>
+<div class="l-popup">
+  <h2>{{osmTypecapitalized}} {{osmElem.id}}</h2>
+  <p>
+    {{opfElem.name}}
+  </p>
+  {{#each opfElem.numberTags}}
+    <h3 class="">{{this.key}}</h3>
+    <table style="width:100%">
+      <tr>
+        <th>Original:</td>
+        <td>{{this.original}}</td>
+        <td rowspan="3"><button>Checked</button></td>
+      </tr>
+      <tr>
+        <th>Formatted:</td>
+        <td>{{this.formatted}}</td>
+      </tr>
+    </table>
+    </p>
+  {{/each}}
 </div>

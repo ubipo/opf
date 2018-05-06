@@ -94,6 +94,21 @@
         right: 20px;
       }
 
+      .l-popup h2 {
+        margin-top: 0.4em;
+        margin-bottom: 0.4em;
+      }
+
+      .l-popup p {
+        margin-top: 0.3em;
+        margin-bottom: 0.3em;
+      }
+
+      .l-popup h3 {
+        margin-top: 0.4em;
+        margin-bottom: 0.4em;
+      }
+
 /*      .overlay h1 {
         font-size: 20px;
       }*/
@@ -789,10 +804,16 @@
 
     function openPopup(marker) {
       var latLng = marker.target._latlng;
+      
+      var opfElem = marker.target.options.opfElem;
+      var osmTypecapitalized = _.capitalize(opfElem.osmElem.type);
+      console.log(opfElem);
       var html = Handlebars.templates['marker.hbs']({
         latLng: latLng, 
         id: marker.target._leaflet_id,
-        osmElem: marker.target.options.opfElem.osmElem
+        osmTypecapitalized: osmTypecapitalized,
+        opfElem: opfElem,
+        osmElem: opfElem.osmElem
       });
       markerPopup.setLatLng(latLng).setContent(html).openOn(map);
     }
