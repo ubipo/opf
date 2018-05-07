@@ -63,6 +63,26 @@
         text-align: center;
         vertical-align: middle;
       }
+
+      .l-btn-text-cont {
+        display: -webkit-flexbox;
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-flex-align: center;
+        -ms-flex-align: center;
+        -webkit-align-items: center;
+        align-items: center;
+        justify-content: center;
+      }
+      .l-btn-text-cont span {
+        font-family: Avenir,Helvetica,Arial,sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        color: #344d50;
+        font-weight: bold;
+        font-size: 20px;
+      }
       .overlay {
         position: absolute;
         z-index: 3000;
@@ -358,6 +378,20 @@
       tableBody.appendChild(tr);
     }
 
+    function parentBySelector(el, selector, stopSelector) {
+      var retval = null;
+      while (el) {
+        if (el.matches(selector)) {
+          retval = el;
+          break
+        } else if (stopSelector && el.matches(stopSelector)) {
+          break
+        }
+        el = el.parentElement;
+      }
+      return retval;
+    }
+
     function appendToTableRow(tableRow, data, customClasses, customAttrib) {
       var td = document.createElement("td");
       for (var customClass of customClasses) {
@@ -560,7 +594,7 @@
         },
         onAdd: function(map) {
           var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom l-btn-icon-cont');
-          container.ondblclick = (e) => {e.stopPropagation();};
+          container.ondblclick = e => e.stopPropagation();
           container.onclick = e => {
             toggleWelcomeOverlay(true);
             Cookies.set('visited', 'true');
@@ -576,15 +610,29 @@
         },
         onAdd: function(map) {
           var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom l-btn-icon-cont l-btn-refresh');
-          container.ondblclick = (e) => {e.stopPropagation();};
+          container.ondblclick = e => e.stopPropagation();
           container.onclick = refresh;
           var icon = L.DomUtil.create('i', 'l-btn-icon fas fa-sync-alt', container);
           return container;
         }
       });
 
+      var countButton = L.Control.extend({
+        options: {
+          position: 'topright' 
+        },
+        onAdd: function(map) {
+          var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom l-btn-text-cont l-btn-count');
+          container.ondblclick = e => e.stopPropagation();
+          container.onclick = e => toggleUploadOverlay(true);
+          var icon = L.DomUtil.create('span', '', container);
+          return container;
+        }
+      });
+
       map.addControl(new infoButton());
       map.addControl(new refreshButton());
+      map.addControl(new countButton());
 
       // var drawnItems = new L.FeatureGroup();
       // drawnItems.addTo(bBoxMap);
@@ -783,32 +831,38 @@
         coords = flattenObject(elem.osmElem.center);
       }
 
+      let marker = new OpfMarker(coords, {
+        opfElem: elem
+      });
+      setMarkerIcon(marker);
+      marker.on('click', e => openPopup(e.target));
+      markers.addLayer(marker);
+    }
+
+    function setMarkerIcon(marker) {
+      var opfElem = marker.options.opfElem;
+
       let icon;
-      if (elem.formatError) {
+      if (opfElem.formatError) {
         icon = phoneMarkerError;
-      } else if (elem.checked) {
+      } else if (opfElem.checked) {
         icon = phoneMarkerChecked;
-      } else if (elem.formattedBefore) {
+      } else if (opfElem.formattedBefore) {
         icon = phoneMarkerFormattedBefore; // Explicitely formatted before
-      } else if (elem.formattedBefore != undefined) {
+      } else if (opfElem.formattedBefore != undefined) {
         icon = phoneMarkerFormatted; // Not already formatted before but checked for formatting
       } else {
         icon = phoneMarkerFallback;
       }
 
-      let marker = new OpfMarker(coords, {
-        opfElem: elem,
-        icon: icon
-      });
-      marker.on('click', openPopup);
-      markers.addLayer(marker);
+      marker.setIcon(icon);
     }
 
     function openPopup(marker) {
-      var latLng = marker.target._latlng;
-      var opfElem = marker.target.options.opfElem;
+      var latLng = marker._latlng;
+      var opfElem = marker.options.opfElem;
       var osmTypecapitalized = _.capitalize(opfElem.osmElem.type);
-      var leafletId = marker.target._leaflet_id;
+      var leafletId = marker._leaflet_id;
       var opfIndex = _.indexOf(opfData, opfElem);
 
       var html = Handlebars.templates['marker.hbs']({
@@ -822,19 +876,26 @@
 
       markerPopup.setLatLng(latLng).setContent(html).openOn(map);
 
-      // Register handlers
+      // Register checkbox handlers
       for (let tag of opfElem.numberTags) {
-        document.getElementById(`marker-${leafletId}-cb-${tag.key}`).onclick = popupToggleCb;
+        document.getElementById(`marker-${leafletId}-cb-${tag.key}`).onclick = e => popupToggleCb(e, tag, opfElem, marker);
       }
     }
 
-    function popupToggleCb(e) {
-      var opfIndex = e.target.getAttribute('opfIndex');
-      var opfKey = e.target.getAttribute('opfKey');
+    function popupToggleCb(e, tag, opfElem, marker) {
       var checked = e.target.checked;
-      var tag = opfData[opfIndex].numberTags.find(elem => elem.key == opfKey);
       tag['checked'] = checked;
-      console.log(tag);
+      updateCountButton();
+      updateCheckedState(opfElem);
+      setMarkerIcon(marker);
+    }
+
+    function updateCheckedState(opfElem) {
+      var allChecked = true;
+      for (let tag of opfElem.numberTags) {
+        if (!tag.checked) allChecked = false;
+      }
+      opfElem.checked = allChecked;
     }
 
     var updateBBoxInfo = function(latlngs) {
@@ -955,6 +1016,21 @@
     */
     function updateElem(elem, newElem) {
       elem = newElem;
+    }
+
+    function updateCountButton() {
+      var count = 0;
+      for (let elem of opfData) {
+        for (let tag of elem.numberTags) {
+          if (tag.checked) count++;
+        }
+      }
+      setCountButton(count);
+    }
+
+    function setCountButton(count) {
+      var countElem = document.getElementsByClassName('l-btn-count')[0].getElementsByTagName('span')[0];
+      countElem.innerHTML = count;
     }
 
     // var parseOverpassData = function(elements) {
