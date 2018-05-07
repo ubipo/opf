@@ -4,16 +4,22 @@
     {{opfElem.name}}
   </p>
   {{#each opfElem.numberTags}}
-    <h3 class="">{{this.key}}</h3>
+    <h3 class="">{{key}}</h3>
     <table style="width:100%">
       <tr>
         <th>Original:</td>
-        <td>{{this.original}}</td>
-        <td rowspan="3"><button>Checked</button></td>
+        <td>{{original}}</td>
+        {{#unless formattedBefore}}
+          <td rowspan="3">
+            <input type="checkbox" id="marker-{{../leafletId}}-cb-{{key}}" class="gillam-cb-input"
+            opfIndex="{{../opfIndex}}" opfKey="{{key}}" {{#if checked}} checked {{/if}}/>
+            <label for="marker-{{../leafletId}}-cb-{{key}}" class="gillam-cb"></label> 
+          </td>
+        {{/unless}}
       </tr>
       <tr>
         <th>Formatted:</td>
-        <td>{{this.formatted}}</td>
+        <td>{{formatted}}</td>
       </tr>
     </table>
     </p>

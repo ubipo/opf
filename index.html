@@ -28,6 +28,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.min.js" integrity="sha256-IqiRR5X1QtAdcq5lG4vBB1/WxwrRCkkjno4pfvWyag0=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css" integrity="sha256-EFpFyBbuttUJtoocYzsBnERPWee2JYz4cn5nkUBjW0A=" crossorigin="anonymous" />
 
+    <link rel="stylesheet" href="css/checkbox.css"/>
+
     <script src="templates/marker.hbc"></script>
 
     <style type="text/css">
@@ -804,18 +806,35 @@
 
     function openPopup(marker) {
       var latLng = marker.target._latlng;
-      
       var opfElem = marker.target.options.opfElem;
       var osmTypecapitalized = _.capitalize(opfElem.osmElem.type);
-      console.log(opfElem);
+      var leafletId = marker.target._leaflet_id;
+      var opfIndex = _.indexOf(opfData, opfElem);
+
       var html = Handlebars.templates['marker.hbs']({
         latLng: latLng, 
-        id: marker.target._leaflet_id,
+        leafletId: leafletId,
         osmTypecapitalized: osmTypecapitalized,
         opfElem: opfElem,
-        osmElem: opfElem.osmElem
+        osmElem: opfElem.osmElem,
+        opfIndex: opfIndex
       });
+
       markerPopup.setLatLng(latLng).setContent(html).openOn(map);
+
+      // Register handlers
+      for (let tag of opfElem.numberTags) {
+        document.getElementById(`marker-${leafletId}-cb-${tag.key}`).onclick = popupToggleCb;
+      }
+    }
+
+    function popupToggleCb(e) {
+      var opfIndex = e.target.getAttribute('opfIndex');
+      var opfKey = e.target.getAttribute('opfKey');
+      var checked = e.target.checked;
+      var tag = opfData[opfIndex].numberTags.find(elem => elem.key == opfKey);
+      tag['checked'] = checked;
+      console.log(tag);
     }
 
     var updateBBoxInfo = function(latlngs) {

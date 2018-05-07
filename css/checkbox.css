@@ -1,117 +1,139 @@
-/* Checkmark style starts */
-
-@-moz-keyframes dothabottomcheck{
-    0% { height: 0; }
-    100% { height: $checkbox-height/2; }
+/* Made by Jimmy Gillam */
+@-moz-keyframes dothabottomcheck {
+  0% {
+    height: 0;
+  }
+  100% {
+    height: 15px;
+  }
+}
+@-webkit-keyframes dothabottomcheck {
+  0% {
+    height: 0;
+  }
+  100% {
+    height: 15px;
+  }
+}
+@keyframes dothabottomcheck {
+  0% {
+    height: 0;
+  }
+  100% {
+    height: 15px;
+  }
+}
+@keyframes dothatopcheck {
+  0% {
+    height: 0;
+  }
+  50% {
+    height: 0;
+  }
+  100% {
+    height: 36px;
+  }
+}
+@-webkit-keyframes dothatopcheck {
+  0% {
+    height: 0;
+  }
+  50% {
+    height: 0;
+  }
+  100% {
+    height: 36px;
+  }
+}
+@-moz-keyframes dothatopcheck {
+  0% {
+    height: 0;
+  }
+  50% {
+    height: 0;
+  }
+  100% {
+    height: 36px;
+  }
+}
+input[type=checkbox].gillam-cb-input {
+  display: none;
 }
 
-@-webkit-keyframes dothabottomcheck{
-    0% { height: 0; }
-    100% { height: $checkbox-height/2; }
+.gillam-cb {
+  height: 30px;
+  width: 30px;
+  background-color: transparent;
+  border: 3px solid #000;
+  border-radius: 5px;
+  position: relative;
+  display: inline-block;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  -moz-transition: border-color ease 0.2s;
+  -o-transition: border-color ease 0.2s;
+  -webkit-transition: border-color ease 0.2s;
+  transition: border-color ease 0.2s;
+  cursor: pointer;
+}
+.gillam-cb::before, .gillam-cb::after {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  position: absolute;
+  height: 0;
+  width: 6px;
+  background-color: #34b93d;
+  display: inline-block;
+  -moz-transform-origin: left top;
+  -ms-transform-origin: left top;
+  -o-transform-origin: left top;
+  -webkit-transform-origin: left top;
+  transform-origin: left top;
+  border-radius: 5px;
+  content: " ";
+  -webkit-transition: opacity ease 0.5;
+  -moz-transition: opacity ease 0.5;
+  transition: opacity ease 0.5;
+}
+.gillam-cb::before {
+  top: 21.6px;
+  left: 12.3px;
+  box-shadow: 0 0 0 1.5px #fff;
+  -moz-transform: rotate(-135deg);
+  -ms-transform: rotate(-135deg);
+  -o-transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+  transform: rotate(-135deg);
+}
+.gillam-cb::after {
+  top: 11.1px;
+  left: 1.5px;
+  -moz-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+  transform: rotate(-45deg);
 }
 
-@keyframes dothabottomcheck{
-    0% { height: 0; }
-    100% { height: $checkbox-height/2;  }
+input[type=checkbox]:checked + .gillam-cb,
+.gillam-cb.checked {
+  border-color: #34b93d;
 }
-
-@keyframes dothatopcheck{
-    0% { height: 0; }
-    50% { height: 0; }
-    100% { height: $checkbox-height * 1.2; }
+input[type=checkbox]:checked + .gillam-cb::after,
+.gillam-cb.checked::after {
+  height: 15px;
+  -moz-animation: dothabottomcheck 0.2s ease 0s forwards;
+  -o-animation: dothabottomcheck 0.2s ease 0s forwards;
+  -webkit-animation: dothabottomcheck 0.2s ease 0s forwards;
+  animation: dothabottomcheck 0.2s ease 0s forwards;
 }
-@-webkit-keyframes dothatopcheck{
-    0% { height: 0; }
-    50% { height: 0; }
-    100% { height: $checkbox-height * 1.2; }
-}
-@-moz-keyframes dothatopcheck{
-    0% { height: 0; }
-    50% { height: 0; }
-    100% { height: $checkbox-height * 1.2; }
-}
-
-input[type=checkbox].gillam-check-box {
-    display:none;
-}
-
-.gillam-check-box {
-    height: $checkbox-height;
-    width: $checkbox-height;
-    background-color: transparent;
-    border: $checkbox-height * .1 solid $unchecked-color;
-    border-radius: 5px;
-    position: relative;
-    display: inline-block;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    -moz-transition: border-color ease $duration/2;
-    -o-transition: border-color ease $duration/2;
-    -webkit-transition: border-color ease $duration/2;
-    transition: border-color ease $duration/2;
-    cursor:pointer;
-
-    &::before, &::after {
-        -moz-box-sizing: border-box;
-        -webkit-box-sizing: border-box;
-        box-sizing: border-box;
-        position: absolute;
-        height: 0;
-        width: $checkbox-height * .2;
-        background-color: $checked-color;
-        display: inline-block;
-        -moz-transform-origin: left top;
-        -ms-transform-origin: left top;
-        -o-transform-origin: left top;
-        -webkit-transform-origin: left top;
-        transform-origin: left top;
-        border-radius: 5px;
-        content: ' ';
-        -webkit-transition: opacity ease .5;
-        -moz-transition: opacity ease .5;
-        transition: opacity ease .5;
-    }
-
-    &::before {
-        top:$checkbox-height * .72;
-        left: $checkbox-height * .41;
-        box-shadow: 0 0 0 $checkbox-height * .05 $background-color;
-        -moz-transform: rotate(-135deg);
-        -ms-transform: rotate(-135deg);
-        -o-transform: rotate(-135deg);
-        -webkit-transform: rotate(-135deg);
-        transform: rotate(-135deg);
-    }
-
-    &::after {
-        top: $checkbox-height * .37;
-        left: $checkbox-height * .05;
-        -moz-transform: rotate(-45deg);
-        -ms-transform: rotate(-45deg);
-        -o-transform: rotate(-45deg);
-        -webkit-transform: rotate(-45deg);
-        transform: rotate(-45deg);
-    }
-}
-
-input[type=checkbox]:checked + .check-box,
-.check-box.checked{
-    border-color:$checked-color;
-    
-    &::after{
-        height: $checkbox-height * .5;
-        -moz-animation: dothabottomcheck $duration/2 ease 0s forwards;
-        -o-animation: dothabottomcheck $duration/2 ease 0s forwards;
-        -webkit-animation: dothabottomcheck $duration/2 ease 0s forwards;
-        animation: dothabottomcheck $duration/2 ease 0s forwards;
-    }
-     
-    &::before{
-        height: $checkbox-height * 1.2;
-        -moz-animation: dothatopcheck $duration ease 0s forwards;
-        -o-animation: dothatopcheck $duration ease 0s forwards;
-        -webkit-animation: dothatopcheck $duration ease 0s forwards;
-        animation: dothatopcheck $duration ease 0s forwards;
-    }
+input[type=checkbox]:checked + .gillam-cb::before,
+.gillam-cb.checked::before {
+  height: 36px;
+  -moz-animation: dothatopcheck 0.4s ease 0s forwards;
+  -o-animation: dothatopcheck 0.4s ease 0s forwards;
+  -webkit-animation: dothatopcheck 0.4s ease 0s forwards;
+  animation: dothatopcheck 0.4s ease 0s forwards;
 }

@@ -1,16 +1,38 @@
 (function() {
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
-templates['marker.hbs'] = template({"1":function(container,depth0,helpers,partials,data) {
-    var alias1=container.lambda, alias2=container.escapeExpression;
+templates['marker.hbs'] = template({"1":function(container,depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
   return "    <h3 class=\"\">"
-    + alias2(alias1((depth0 != null ? depth0.key : depth0), depth0))
+    + alias4(((helper = (helper = helpers.key || (depth0 != null ? depth0.key : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"key","hash":{},"data":data}) : helper)))
     + "</h3>\n    <table style=\"width:100%\">\n      <tr>\n        <th>Original:</td>\n        <td>"
-    + alias2(alias1((depth0 != null ? depth0.original : depth0), depth0))
-    + "</td>\n        <td rowspan=\"3\"><button>Checked</button></td>\n      </tr>\n      <tr>\n        <th>Formatted:</td>\n        <td>"
-    + alias2(alias1((depth0 != null ? depth0.formatted : depth0), depth0))
+    + alias4(((helper = (helper = helpers.original || (depth0 != null ? depth0.original : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"original","hash":{},"data":data}) : helper)))
+    + "</td>\n"
+    + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.formattedBefore : depth0),{"name":"unless","hash":{},"fn":container.program(2, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "      </tr>\n      <tr>\n        <th>Formatted:</td>\n        <td>"
+    + alias4(((helper = (helper = helpers.formatted || (depth0 != null ? depth0.formatted : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"formatted","hash":{},"data":data}) : helper)))
     + "</td>\n      </tr>\n    </table>\n    </p>\n";
-},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+},"2":function(container,depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, helper, alias1=container.lambda, alias2=container.escapeExpression, alias3=depth0 != null ? depth0 : (container.nullContext || {}), alias4=helpers.helperMissing, alias5="function";
+
+  return "          <td rowspan=\"3\">\n            <input type=\"checkbox\" id=\"marker-"
+    + alias2(alias1((depths[1] != null ? depths[1].leafletId : depths[1]), depth0))
+    + "-cb-"
+    + alias2(((helper = (helper = helpers.key || (depth0 != null ? depth0.key : depth0)) != null ? helper : alias4),(typeof helper === alias5 ? helper.call(alias3,{"name":"key","hash":{},"data":data}) : helper)))
+    + "\" class=\"gillam-cb-input\"\n            opfIndex=\""
+    + alias2(alias1((depths[1] != null ? depths[1].opfIndex : depths[1]), depth0))
+    + "\" opfKey=\""
+    + alias2(((helper = (helper = helpers.key || (depth0 != null ? depth0.key : depth0)) != null ? helper : alias4),(typeof helper === alias5 ? helper.call(alias3,{"name":"key","hash":{},"data":data}) : helper)))
+    + "\" "
+    + ((stack1 = helpers["if"].call(alias3,(depth0 != null ? depth0.checked : depth0),{"name":"if","hash":{},"fn":container.program(3, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "/>\n            <label for=\"marker-"
+    + alias2(alias1((depths[1] != null ? depths[1].leafletId : depths[1]), depth0))
+    + "-cb-"
+    + alias2(((helper = (helper = helpers.key || (depth0 != null ? depth0.key : depth0)) != null ? helper : alias4),(typeof helper === alias5 ? helper.call(alias3,{"name":"key","hash":{},"data":data}) : helper)))
+    + "\" class=\"gillam-cb\"></label> \n          </td>\n";
+},"3":function(container,depth0,helpers,partials,data) {
+    return " checked ";
+},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=container.escapeExpression, alias3=container.lambda;
 
   return "<div class=\"l-popup\">\n  <h2>"
@@ -20,7 +42,7 @@ templates['marker.hbs'] = template({"1":function(container,depth0,helpers,partia
     + "</h2>\n  <p>\n    "
     + alias2(alias3(((stack1 = (depth0 != null ? depth0.opfElem : depth0)) != null ? stack1.name : stack1), depth0))
     + "\n  </p>\n"
-    + ((stack1 = helpers.each.call(alias1,((stack1 = (depth0 != null ? depth0.opfElem : depth0)) != null ? stack1.numberTags : stack1),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers.each.call(alias1,((stack1 = (depth0 != null ? depth0.opfElem : depth0)) != null ? stack1.numberTags : stack1),{"name":"each","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "</div>";
-},"useData":true});
+},"useData":true,"useDepths":true});
 })();
