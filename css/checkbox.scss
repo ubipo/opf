@@ -1,6 +1,7 @@
 /* Made by Jimmy Gillam */
 $checked-color: #34b93d;
 $unchecked-color: #344d50;
+$disabled-color: #c6c6c6;
 $checkbox-height: 30px;
 $background-color: #fff;
 $duration: .4s;
@@ -99,6 +100,10 @@ input[type=checkbox].gillam-cb-input {
         -webkit-transform: rotate(-45deg);
         transform: rotate(-45deg);
     }
+}
+
+input[type=checkbox]:disabled + .gillam-cb {
+    border-color: $disabled-color;
 }
 
 input[type=checkbox]:checked + .gillam-cb,

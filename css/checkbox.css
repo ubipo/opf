@@ -64,7 +64,7 @@ input[type=checkbox].gillam-cb-input {
   height: 30px;
   width: 30px;
   background-color: transparent;
-  border: 3px solid #000;
+  border: 3px solid #344d50;
   border-radius: 5px;
   position: relative;
   display: inline-block;
@@ -115,6 +115,10 @@ input[type=checkbox].gillam-cb-input {
   -o-transform: rotate(-45deg);
   -webkit-transform: rotate(-45deg);
   transform: rotate(-45deg);
+}
+
+input[type=checkbox]:disabled + .gillam-cb {
+  border-color: #c6c6c6;
 }
 
 input[type=checkbox]:checked + .gillam-cb,

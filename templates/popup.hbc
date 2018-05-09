@@ -1,0 +1,46 @@
+(function() {
+  var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
+templates['popup.hbs'] = template({"1":function(container,depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression, alias5=container.lambda;
+
+  return "    <h3 class=\"\">"
+    + alias4(((helper = (helper = helpers.key || (depth0 != null ? depth0.key : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"key","hash":{},"data":data}) : helper)))
+    + "</h3>\n    <table style=\"width:100%\">\n      <tr>\n        <th>Original:</td>\n        <td>"
+    + alias4(((helper = (helper = helpers.original || (depth0 != null ? depth0.original : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"original","hash":{},"data":data}) : helper)))
+    + "</td>\n        <td rowspan=\"3\">\n          <input id=\"popup-"
+    + alias4(alias5((depths[1] != null ? depths[1].leafletId : depths[1]), depth0))
+    + "-cb-"
+    + alias4(((helper = (helper = helpers.key || (depth0 != null ? depth0.key : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"key","hash":{},"data":data}) : helper)))
+    + "\" class=\"gillam-cb-input\" type=\"checkbox\"\n          "
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.checked : depth0),{"name":"if","hash":{},"fn":container.program(2, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\n          "
+    + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.changed : depth0),{"name":"unless","hash":{},"fn":container.program(4, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "/>\n          <label for=\"popup-"
+    + alias4(alias5((depths[1] != null ? depths[1].leafletId : depths[1]), depth0))
+    + "-cb-"
+    + alias4(((helper = (helper = helpers.key || (depth0 != null ? depth0.key : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"key","hash":{},"data":data}) : helper)))
+    + "\" class=\"gillam-cb\"></label> \n        </td>\n      </tr>\n      <tr>\n        <th>Formatted:</td>\n        <td><div class=\"popup-formatted\" id=\"popup-"
+    + alias4(alias5((depths[1] != null ? depths[1].leafletId : depths[1]), depth0))
+    + "-formatted-"
+    + alias4(((helper = (helper = helpers.key || (depth0 != null ? depth0.key : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"key","hash":{},"data":data}) : helper)))
+    + "\" contenteditable=\"true\">"
+    + alias4(((helper = (helper = helpers.formatted || (depth0 != null ? depth0.formatted : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"formatted","hash":{},"data":data}) : helper)))
+    + "</div></td>\n      </tr>\n    </table>\n";
+},"2":function(container,depth0,helpers,partials,data) {
+    return "checked=\"checked\"";
+},"4":function(container,depth0,helpers,partials,data) {
+    return "disabled=\"disabled\"";
+},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=container.escapeExpression, alias3=container.lambda;
+
+  return "<div class=\"l-popup\">\n  <h2>"
+    + alias2(((helper = (helper = helpers.osmTypecapitalized || (depth0 != null ? depth0.osmTypecapitalized : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"osmTypecapitalized","hash":{},"data":data}) : helper)))
+    + " "
+    + alias2(alias3(((stack1 = (depth0 != null ? depth0.osmElem : depth0)) != null ? stack1.id : stack1), depth0))
+    + "</h2>\n  <p>\n    "
+    + alias2(alias3(((stack1 = (depth0 != null ? depth0.opfElem : depth0)) != null ? stack1.name : stack1), depth0))
+    + "\n  </p>\n"
+    + ((stack1 = helpers.each.call(alias1,((stack1 = (depth0 != null ? depth0.opfElem : depth0)) != null ? stack1.numberTags : stack1),{"name":"each","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "</div>";
+},"useData":true,"useDepths":true});
+})();

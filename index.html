@@ -30,7 +30,8 @@
 
     <link rel="stylesheet" href="css/checkbox.css"/>
 
-    <script src="templates/marker.hbc"></script>
+    <script src="templates/popup.hbc"></script>
+    <link rel="stylesheet" href="css/popup.css"/>
 
     <style type="text/css">
       .hidden {
@@ -114,21 +115,6 @@
         cursor: pointer;
         top: 20px;
         right: 20px;
-      }
-
-      .l-popup h2 {
-        margin-top: 0.4em;
-        margin-bottom: 0.4em;
-      }
-
-      .l-popup p {
-        margin-top: 0.3em;
-        margin-bottom: 0.3em;
-      }
-
-      .l-popup h3 {
-        margin-top: 0.4em;
-        margin-bottom: 0.4em;
       }
 
 /*      .overlay h1 {
@@ -434,25 +420,25 @@
           opfElem: {}
        }
     });
-    var phoneMarkerFormattedBefore = L.AwesomeMarkers.icon({
-      icon: 'phone',
-      prefix: 'fas fa',
-      markerColor: 'blue'
-    });
-    var phoneMarkerFormatted = L.AwesomeMarkers.icon({
-      icon: 'phone',
-      prefix: 'fas fa',
-      markerColor: 'orange'
-    });
     var phoneMarkerError = L.AwesomeMarkers.icon({
       icon: 'phone',
       prefix: 'fas fa',
       markerColor: 'red'
     });
+    var phoneMarkerUnchecked = L.AwesomeMarkers.icon({
+      icon: 'phone',
+      prefix: 'fas fa',
+      markerColor: 'orange'
+    });
     var phoneMarkerChecked = L.AwesomeMarkers.icon({
       icon: 'phone',
       prefix: 'fas fa',
       markerColor: 'green'
+    });
+    var phoneMarkerFormatted = L.AwesomeMarkers.icon({
+      icon: 'phone',
+      prefix: 'fas fa',
+      markerColor: 'blue'
     });
     var phoneMarkerFallback = L.AwesomeMarkers.icon({
       icon: 'phone',
@@ -841,61 +827,109 @@
 
     function setMarkerIcon(marker) {
       var opfElem = marker.options.opfElem;
+      var flag = mostImportantFormattingFlag(opfElem);
 
-      let icon;
-      if (opfElem.formatError) {
-        icon = phoneMarkerError;
-      } else if (opfElem.checked) {
-        icon = phoneMarkerChecked;
-      } else if (opfElem.formattedBefore) {
-        icon = phoneMarkerFormattedBefore; // Explicitely formatted before
-      } else if (opfElem.formattedBefore != undefined) {
-        icon = phoneMarkerFormatted; // Not already formatted before but checked for formatting
-      } else {
-        icon = phoneMarkerFallback;
+      var flagToIconMap = {
+        4: phoneMarkerError,
+        3: phoneMarkerUnchecked,
+        2: phoneMarkerChecked,
+        1: phoneMarkerFormatted,
+        0: phoneMarkerFallback
       }
+
+      let icon = flagToIconMap[flag];
 
       marker.setIcon(icon);
     }
 
+    /**
+     * Finds the UX-wise most important flag of an opf element
+     * Order of importance:
+     * unchecked format error (4) > changed and unchecked (3) > changed and checked (2) > formatted (1) > no formatting data (0)
+     *
+     * @Returns id of flag (0-4 inclusive)
+     */
+    function mostImportantFormattingFlag(opfElem) {
+      var flag = 0; // Start with lowest flag and increase when necessary
+      for (let tag of opfElem.numberTags) {
+        // unchecked format error
+        if (tag.formatError && !tag.checked) {
+          flag = 4;
+          break; // flag can not get higher than this, stop searching
+        }
+        // changed and unchecked
+        else if (tag.formatted && tag.original != tag.formatted && !tag.checked) {
+          void(flag < 3 && (flag = 3));
+        }
+        // changed and checked
+        else if (tag.formatted && tag.original != tag.formatted && tag.checked) {
+          void(flag < 2 && (flag = 2));
+        }
+        // formatted
+        else if (tag.formatted) {
+          void(flag < 1 && (flag = 1));
+        }
+        // no formatting data; flag = 0; no change
+      }
+      return flag
+    }
+
+    /**
+     * Opens a popup using the opropriate data retrieved
+     * from the supplied marker.
+     *
+     * @Returns void
+     */
     function openPopup(marker) {
       var latLng = marker._latlng;
       var opfElem = marker.options.opfElem;
       var osmTypecapitalized = _.capitalize(opfElem.osmElem.type);
       var leafletId = marker._leaflet_id;
-      var opfIndex = _.indexOf(opfData, opfElem);
 
-      var html = Handlebars.templates['marker.hbs']({
+      updateChangedStates(opfElem);
+
+      var html = Handlebars.templates['popup.hbs']({
         latLng: latLng, 
         leafletId: leafletId,
         osmTypecapitalized: osmTypecapitalized,
         opfElem: opfElem,
         osmElem: opfElem.osmElem,
-        opfIndex: opfIndex
       });
 
       markerPopup.setLatLng(latLng).setContent(html).openOn(map);
 
-      // Register checkbox handlers
+      // Register event handlers
       for (let tag of opfElem.numberTags) {
-        document.getElementById(`marker-${leafletId}-cb-${tag.key}`).onclick = e => popupToggleCb(e, tag, opfElem, marker);
+        document.getElementById(`popup-${leafletId}-cb-${tag.key}`)
+        .addEventListener('click', e => popupCbToggled(e, tag, marker), false);
+        document.getElementById(`popup-${leafletId}-formatted-${tag.key}`)
+        .addEventListener('input', e => popupFormattedInput(e, tag, marker), false);
       }
     }
 
-    function popupToggleCb(e, tag, opfElem, marker) {
+    function updateChangedStates(opfElem) {
+      for (let tag of opfElem.numberTags) {
+        tag.changed = (tag.formatted != tag.original);
+        console.log(tag);
+      }
+    }
+
+    function popupCbToggled(e, tag, marker) {
       var checked = e.target.checked;
       tag['checked'] = checked;
       updateCountButton();
-      updateCheckedState(opfElem);
       setMarkerIcon(marker);
     }
 
-    function updateCheckedState(opfElem) {
-      var allChecked = true;
-      for (let tag of opfElem.numberTags) {
-        if (!tag.checked) allChecked = false;
-      }
-      opfElem.checked = allChecked;
+    function popupFormattedInput(e, tag, marker) {
+      tag.formatted = _.trim(e.target.textContent);
+      console.log(tag.formatted);
+      tag.changed = (tag.formatted != tag.original);
+      var action = tag.changed ? 'removeAttribute' : 'setAttribute';
+      var tableElem = parentBySelector(e.target, 'table');
+      var cbElem = tableElem.querySelector('input[type="checkbox"]')
+      cbElem[action]('disabled', 'disabled');
+      setMarkerIcon(marker);
     }
 
     var updateBBoxInfo = function(latlngs) {
@@ -1108,26 +1142,15 @@
         throw('Element is missing a country code, use updateMetadata() first');
       }
 
-      var anyFormatError = false; // Tracks if any tag fails to format
-      var anyNotFormattedBefore = false; // Tracks if any tag was not already formatted
       for (let tag of elem.numberTags) {
         let formatted = formatNumber(tag.original, countryCode);
-        if (formatted) {
-          tag['formatted'] = formatted;
-          if (formatted == tag.original) {
-            tag['formattedBefore'] = true;
-          } else {
-            anyNotFormattedBefore = true;
-          }
-        } else {
-          console.debug('error')
+        if (!formatted) {
           tag['formatError'] = true;
-          anyFormatError = true;
+          tag['formatted'] = tag.original;
+        } else {
+          tag['formatted'] = formatted;
         }
       }
-
-      elem['formatError'] = anyFormatError;
-      elem['formattedBefore'] = !anyNotFormattedBefore;
 
       return elem;
 

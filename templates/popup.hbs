@@ -1,0 +1,25 @@
+<div class="l-popup">
+  <h2>{{osmTypecapitalized}} {{osmElem.id}}</h2>
+  <p>
+    {{opfElem.name}}
+  </p>
+  {{#each opfElem.numberTags}}
+    <h3 class="">{{key}}</h3>
+    <table style="width:100%">
+      <tr>
+        <th>Original:</td>
+        <td>{{original}}</td>
+        <td rowspan="3">
+          <input id="popup-{{../leafletId}}-cb-{{key}}" class="gillam-cb-input" type="checkbox"
+          {{#if checked}}checked="checked"{{/if}}
+          {{#unless changed}}disabled="disabled"{{/unless}}/>
+          <label for="popup-{{../leafletId}}-cb-{{key}}" class="gillam-cb"></label> 
+        </td>
+      </tr>
+      <tr>
+        <th>Formatted:</td>
+        <td><div class="popup-formatted" id="popup-{{../leafletId}}-formatted-{{key}}" contenteditable="true">{{formatted}}</div></td>
+      </tr>
+    </table>
+  {{/each}}
+</div>

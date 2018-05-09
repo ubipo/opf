@@ -1,0 +1,32 @@
+.l-popup h2, .l-popup h3, .l-popup p, .l-popup input {
+  font-family: Avenir,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #344d50;
+}
+
+.popup-formatted {
+  font-size: 12px;
+  color: #005093;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  height: 1.5em;
+  width: 8.5em;
+  border: 1px solid #344d50;
+}
+
+.l-popup h2 {
+  margin-top: 0.4em;
+  margin-bottom: 0.4em;
+}
+
+.l-popup p {
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
+}
+
+.l-popup h3 {
+  margin-top: 0.4em;
+  margin-bottom: 0.4em;
+}
