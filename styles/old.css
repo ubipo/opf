@@ -1,0 +1,56 @@
+/* old.css - Unused styling for versions below 1 */
+
+#toggle-advanced-options {
+  margin-top: 0.3em;
+  margin-bottom: 0.7em;
+}
+#custom-regex {
+  visibility: hidden;
+}
+#query {
+  display: inline-block;
+  border: solid 1px #000;
+  min-height: 9em;
+  max-height: 30em;
+  min-width: 14em;
+  max-width: 70em;
+  overflow: scroll;
+  font-family: Consolas, monaco, monospace;
+  font-size: 9pt;
+}
+#regex-picker {
+  display: block;
+}
+#query-form p {
+  margin-bottom: 0.3em;
+  margin-top: 0;
+}
+#query-form > span, button {
+  display: block;
+}
+.hidden {
+  display: none;
+}
+#query-recalculate {
+  margin-top: 1em;
+}
+hr {
+  max-width: 25em;
+}
+
+.main-elem {
+  background-color: hsl(0, 0%, 94%);
+}
+.formatted {
+  color: #5386b1;
+}
+.checked-state {
+  color: white;
+  background-color: orange;
+}
+.checked {
+  background-color: #53b162;
+}
+#data-actions button, span {
+  margin-bottom: 0.3em;
+}

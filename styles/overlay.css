@@ -1,0 +1,30 @@
+.overlay {
+  position: absolute;
+  z-index: 3100;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.overlay-content {
+  margin-top: 5em;
+  margin-left: 7em;
+}
+
+.overlay h1, .overlay h2, .overlay p {
+  font-family: Avenir,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #344d50;
+}
+
+.overlay .close-btn {
+  font-size: 35px;
+  color: #344d50;
+  position: absolute;
+  cursor: pointer;
+  top: 20px;
+  right: 20px;
+}

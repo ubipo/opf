@@ -1,6 +1,6 @@
 (function() {
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
-templates['popup.hbs'] = template({"1":function(container,depth0,helpers,partials,data,blockParams,depths) {
+templates['popup'] = template({"1":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression, alias5=container.lambda;
 
   return "    <h3 class=\"\">"
@@ -43,4 +43,13 @@ templates['popup.hbs'] = template({"1":function(container,depth0,helpers,partial
     + ((stack1 = helpers.each.call(alias1,((stack1 = (depth0 != null ? depth0.opfElem : depth0)) != null ? stack1.numberTags : stack1),{"name":"each","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "</div>";
 },"useData":true,"useDepths":true});
+templates['upload'] = template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    var stack1, alias1=container.lambda, alias2=container.escapeExpression;
+
+  return "<div>\n  <p>You corrected <b>"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.count : depth0)) != null ? stack1.tags : stack1), depth0))
+    + "</b> tags, spread over <b>"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.count : depth0)) != null ? stack1.elems : stack1), depth0))
+    + "</b> OSM elements.</p>\n  <p>\n    <button id=\"gen-osm-change\" class=\"styled-btn\">Download OsmChange file</button>\n    <a id=\"osm-change-dl\"></a>\n  </p>\n  <p>\n    <span>\n      Automatic uploads do not work yet.\n      You can use <a href=\"https://wiki.openstreetmap.org/wiki/Upload.py\">upload.py</a> in the meantime.\n    </span>\n  </p>\n</div>";
+},"useData":true});
 })();
