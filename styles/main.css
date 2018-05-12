@@ -1,0 +1,22 @@
+body {
+  margin: 0;
+  position: relative;
+}
+
+.tagline {
+  margin-bottom: 2px;
+}
+
+.tagline+p {
+  margin-top: 0;
+  font-style: italic;
+}
+
+#map {
+  width: 100vw;
+  height: 100vh;
+}
+
+.hidden {
+  display: none;
+}

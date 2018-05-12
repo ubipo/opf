@@ -1,0 +1,26 @@
+<div>
+  <div>
+    <h1 id="modal-info-title" class="tagline">OPF - OSM Phone Formatter</h1>
+    <p>
+      Easily fix the formatting of phone and fax numbers on OpenStreetMap<br>
+      Beta - version <span id="version">{{version}}</span>
+    </p>
+
+    <p>When you refresh the map (using the topright rotating arrows button), markers appear. These markers indicate an OSM element with one or more number tags like "phone=" or "contact:fax=".</p>
+    <p>A <span style="color: #37A7D9">blue</span> marker means that all telephone and fax numbers of that OSM element should be formatted correctly.</p>
+    <p>An <span style="color: #F59630">orange</span> one means OPF found a number that wasn't formatted correctly, click it to check out what changed.</p>
+    <p>A <span style="color: #72AF26">green</span> one means you comfirmed that all numbers of that marker are correct, this marker will be included in the final upload.</p>
+    <p>A <span style="color: #D53E2A">red</span> marker should normally not appear on the map, it means OPF had trouble parsing a number.</p>
+    <p>When you are ready formatting numbers in an area, click the upload (arrow up) button in the topright.</p>
+    <br>
+    <p>If you want you can still use the <a href="/old.html">old version of OPF</a></p>
+    <p>Report problems or contribute to this tool on <a href="https://github.com/ubipo/opf" target="_blank">github</a></p>
+  </div>
+  <footer class="modal-footer">
+    <p>
+      <input id="dsa-infoModal" type="checkbox" {{#if dsaInfoModal}}checked="checked"{{/if}}>
+      <label for="dsa-infoModal">Don't show again</label>
+    </p>
+    <button class="styled-btn" data-micromodal-close aria-label="Close this dialog window">Start</button>
+  </footer>
+</div>

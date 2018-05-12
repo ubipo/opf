@@ -1,5 +1,16 @@
 (function() {
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
+templates['info'] = template({"1":function(container,depth0,helpers,partials,data) {
+    return "checked=\"checked\"";
+},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {});
+
+  return "<div>\n  <div>\n    <h1 id=\"modal-info-title\" class=\"tagline\">OPF - OSM Phone Formatter</h1>\n    <p>\n      Easily fix the formatting of phone and fax numbers on OpenStreetMap<br>\n      Beta - version <span id=\"version\">"
+    + container.escapeExpression(((helper = (helper = helpers.version || (depth0 != null ? depth0.version : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"version","hash":{},"data":data}) : helper)))
+    + "</span>\n    </p>\n\n    <p>When you refresh the map (using the topright rotating arrows button), markers appear. These markers indicate an OSM element with one or more number tags like \"phone=\" or \"contact:fax=\".</p>\n    <p>A <span style=\"color: #37A7D9\">blue</span> marker means that all telephone and fax numbers of that OSM element should be formatted correctly.</p>\n    <p>An <span style=\"color: #F59630\">orange</span> one means OPF found a number that wasn't formatted correctly, click it to check out what changed.</p>\n    <p>A <span style=\"color: #72AF26\">green</span> one means you comfirmed that all numbers of that marker are correct, this marker will be included in the final upload.</p>\n    <p>A <span style=\"color: #D53E2A\">red</span> marker should normally not appear on the map, it means OPF had trouble parsing a number.</p>\n    <p>When you are ready formatting numbers in an area, click the upload (arrow up) button in the topright.</p>\n    <br>\n    <p>If you want you can still use the <a href=\"/old.html\">old version of OPF</a></p>\n    <p>Report problems or contribute to this tool on <a href=\"https://github.com/ubipo/opf\" target=\"_blank\">github</a></p>\n  </div>\n  <footer class=\"modal-footer\">\n    <p>\n      <input id=\"dsa-infoModal\" type=\"checkbox\" "
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.dsaInfoModal : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + ">\n      <label for=\"dsa-infoModal\">Don't show again</label>\n    </p>\n    <button class=\"styled-btn\" data-micromodal-close aria-label=\"Close this dialog window\">Start</button>\n  </footer>\n</div>";
+},"useData":true});
 templates['popup'] = template({"1":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression, alias5=container.lambda;
 
@@ -46,7 +57,7 @@ templates['popup'] = template({"1":function(container,depth0,helpers,partials,da
 templates['upload'] = template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=container.lambda, alias2=container.escapeExpression;
 
-  return "<div>\n  <p>You corrected <b>"
+  return "<div>\n  <h1 id=\"modal-info-title\">Upload data</h1>\n  <p>You corrected <b>"
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.count : depth0)) != null ? stack1.tags : stack1), depth0))
     + "</b> tags, spread over <b>"
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.count : depth0)) != null ? stack1.elems : stack1), depth0))
