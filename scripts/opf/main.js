@@ -1,55 +1,20 @@
-define(['leaflet', 'leaflet.markercluster', 'leaflet.awesome-markers', 'utils', 'handlebars-templates'], function() {
-  'use strict';
-	var L = require('leaflet');
-  require('leaflet.markercluster');
-  require('leaflet.awesome-markers');
+define(['./Utils', './handlebars-templates', './Opf', './OpfUI'], function(Utils, handlebarsTemplates, Opf, OpfUI) {
+  // const Opf = require('./Opf');
+  // const OpfUI = require('./OpfUI');
+  // const Utils = require('./utils');
+  // require('./handlebars-templates');
 
-  require('utils');
-
-  require('handlebars-templates');
-
-  var opfVersion = 1.3; // Tool version
+  const opfVersion = 1.3; // Tool version
   var defaultBBox = [[50.88081821539843, 4.706557989120484], [50.87751134170449, 4.696494340896607]];
   var bBoxCoords;
   var formatted = false;
   var checkedAll = false;
   var showAdvancedOptions = false;
   var opfData = [];
-  var map;
-  var markers = L.markerClusterGroup();
   var prevBounds;
-  var markerPopup = L.popup();
-  var OpfMarker = L.Marker.extend({
-     options: { 
-        opfElem: {}
-     }
-  });
-  var phoneMarkerError = L.AwesomeMarkers.icon({
-    icon: 'phone',
-    prefix: 'fas fa',
-    markerColor: 'red'
-  });
-  var phoneMarkerUnchecked = L.AwesomeMarkers.icon({
-    icon: 'phone',
-    prefix: 'fas fa',
-    markerColor: 'orange'
-  });
-  var phoneMarkerChecked = L.AwesomeMarkers.icon({
-    icon: 'phone',
-    prefix: 'fas fa',
-    markerColor: 'green'
-  });
-  var phoneMarkerFormatted = L.AwesomeMarkers.icon({
-    icon: 'phone',
-    prefix: 'fas fa',
-    markerColor: 'blue'
-  });
-  var phoneMarkerFallback = L.AwesomeMarkers.icon({
-    icon: 'phone',
-    prefix: 'fas fa',
-    markerColor: 'cadetblue'
-  });
 
+
+  var phoneMarkerError, phoneMarkerUnchecked, phoneMarkerChecked, phoneMarkerFormatted, phoneMarkerFallback;
 
   var refreshState = 'enabled'; // Either 'enabled', 'disabled' or 'busy'
   var minRefreshDelta = 3000;
@@ -81,6 +46,9 @@ define(['leaflet', 'leaflet.markercluster', 'leaflet.awesome-markers', 'utils', 
     auto: true
   };
 
+  var opf = new Opf();
+  var ui = new OpfUI();
+
   function firstVisitCheck() {
     if (!JSON.parse(localStorage.getItem('dsaInfoModal'))) showInfoModal();
   }
@@ -94,130 +62,8 @@ define(['leaflet', 'leaflet.markercluster', 'leaflet.awesome-markers', 'utils', 
     MicroModal.init();
 
     initLeaflet();
-    refresh();
+    // refresh(); // TODO removed
     updateCountButton();
-  }
-
-  function initLeaflet() {
-    map = L.map('map');
-    var osmAttribution = '&copy; <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a> contributors';
-    var tileOsmbeAttribution = 'Tiles courtesy of <a href="https://geo6.be/" target="_blank">GEO-6</a>';
-    var fixTheMap = '<a href="https://www.openstreetmap.org/fixthemap" target="_blank">Found an error?</a>';
-    var osm = L.tileLayer('https://tile.osm.be/osmbe/{z}/{x}/{y}.png', {
-      attribution: `${osmAttribution} | ${fixTheMap} | ${tileOsmbeAttribution}`,
-      maxZoom: 18
-    }).addTo(map);
-
-    // L.easyButton('fas fa-info', function(btn, map){
-    //     welcomeOverlay();
-    // }).addTo(map);
-
-    var infoButton = L.Control.extend({
-      options: {
-        position: 'topleft' 
-      },
-      onAdd: function(map) {
-        var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control l-btn l-btn-icon-cont');
-        container.addEventListener('dblclick', e => e.stopPropagation(), false)
-        container.addEventListener('click', showInfoModal, false);
-        var icon = L.DomUtil.create('i', 'l-btn-icon fas fa-info', container);
-        return container;
-      }
-    });
-
-    var refreshButton = L.Control.extend({
-      options: {
-        position: 'topright' 
-      },
-      onAdd: function(map) {
-        var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control l-btn l-btn-icon-cont l-btn-refresh');
-        container.addEventListener('dblclick', e => e.stopPropagation(), false)
-        container.addEventListener('click', refresh, false);
-        var icon = L.DomUtil.create('i', 'l-btn-icon fas fa-sync-alt', container);
-        return container;
-      }
-    });
-
-    var uploadControl = L.Control.extend({
-      options: {
-        position: 'topright' 
-      },
-      onAdd: function(map) {
-        var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control l-group');
-        container.addEventListener('dblclick', e => e.stopPropagation(), false)
-        container.addEventListener('click', showUploadModal, false)
-        var countButton = L.DomUtil.create('div', 'l-btn-text-cont l-btn l-btn-count', container);
-        var countIcon = L.DomUtil.create('span', '', countButton);
-        var uploadButton = L.DomUtil.create('div', 'l-btn-text-cont l-btn l-btn-icon-cont', container);
-        var uploadIcon = L.DomUtil.create('i', 'l-btn-icon fas fa-arrow-up', uploadButton);
-        return container;
-      }
-    });
-
-    map.addControl(new infoButton());
-    map.addControl(new refreshButton());
-    map.addControl(new uploadControl());
-
-    // var drawnItems = new L.FeatureGroup();
-    // drawnItems.addTo(bBoxMap);
-
-    // var drawControl = new L.Control.Draw({
-    //   edit: {
-    //     featureGroup: drawnItems,
-    //     remove: false
-    //   },
-    //   draw: {
-    //     featureGroup: drawnItems,
-    //     rectangle: {
-    //       enable: true,
-    //       showArea:true,
-    //       metric: ['km', 'm']
-    //     },
-    //     polygon: false,
-    //     marker: false,
-    //     circle: false,
-    //     polyline: false,
-    //     circlemarker: false
-    //   }
-    // });
-
-    // var bBox = L.rectangle(defaultBBox);
-    // bBox.addTo(drawnItems);
-    // updateBBoxInfo(bBox.getLatLngs()[0]);
-    map.fitBounds(defaultBBox);
-
-    prevBounds = objectValuesToArray(map.getBounds());
-
-    map.on('move', function(e) {
-      window.clearTimeout(mapDeltaTimeout);
-      mapDeltaTimeout = window.setTimeout(testMapDelta, 500);
-    });
-
-    map.on("zoomend", function(e) {
-      testMinZoom();
-    });
-
-    map.addLayer(markers);
-
-    // bBoxMap.addControl(drawControl);
-
-    // bBoxMap.on('draw:created', function(event) {
-    //   var layer = event.layer;
-    //   drawnItems.eachLayer(function(layer) {
-    //     drawnItems.removeLayer(layer);
-    //   });  
-    //   drawnItems.addLayer(layer);
-
-    //   updateBBoxInfo(layer._defaultShape());
-    // });
-
-    // // Object(s) edited - update popups
-    // bBoxMap.on('draw:edited', function(event) {
-    //   var layers = event.layers;
-    //   layers.eachLayer(function(layer) {
-    //     updateBBoxInfo(layer._defaultShape())
-    //   });
-    // });
   }
 
   function testMapDelta() {
@@ -296,40 +142,7 @@ define(['leaflet', 'leaflet.markercluster', 'leaflet.awesome-markers', 'utils', 
     MicroModal.show('modal-upload');
   }
 
-  function refresh() {
-    NProgress.start();
-    if (refreshState == 'enabled') {
-      setRefreshState('busy');
-      refreshScheduled = false;
-      console.debug('Starting refresh...');
-      fetchOverpassData(recalculateQuery()).then((data) => {
-        let elems = parseOverpassData(data);
-        let newElems = addNewData(elems);
-        updateMetadata(newElems).then(() => {
-          newElems.forEach(formatElem);
-          newElems.forEach(drawElement);
-
-          console.debug('Refresh done!')
-          NProgress.done();
-
-          setRefreshState('timeout');
-          console.debug('Overpass API stress timeout started...')
-          window.setTimeout(enableRefreshTimeoutEnd, minRefreshDelta);
-        })
-      });
-    } else {
-      refreshScheduled = true;
-    }
-  }
-
-  function enableRefreshTimeoutEnd() {
-    console.debug('Overpass API stress timeout ended')
-    setRefreshState('enabled');
-    if (refreshScheduled) refresh();
-  }
-
-  function setRefreshState(state) {
-    refreshState = state;
+  function oldRefresh() {
     if (zoomDisableScheduled && !testMinZoom()) return;
 
     var cont = qs('#map .l-btn-refresh'); // Refresh button container
@@ -397,16 +210,7 @@ define(['leaflet', 'leaflet.markercluster', 'leaflet.awesome-markers', 'utils', 
   function setMarkerIcon(marker) {
     var opfElem = marker.options.opfElem;
     var flag = mostImportantFormattingFlag(opfElem);
-
-    var flagToIconMap = {
-      4: phoneMarkerError,
-      3: phoneMarkerUnchecked,
-      2: phoneMarkerChecked,
-      1: phoneMarkerFormatted,
-      0: phoneMarkerFallback
-    }
-
-    let icon = flagToIconMap[flag];
+    let icon = markerIcons[flag];
 
     marker.setIcon(icon);
   }
@@ -458,7 +262,7 @@ define(['leaflet', 'leaflet.markercluster', 'leaflet.awesome-markers', 'utils', 
     updateChangedStates(opfElem);
 
     var html = Handlebars.templates['popup']({
-      latLng: latLng, 
+      latLng: latLng,
       leafletId: leafletId,
       osmTypecapitalized: osmTypecapitalized,
       opfElem: opfElem,
@@ -547,7 +351,7 @@ define(['leaflet', 'leaflet.markercluster', 'leaflet.awesome-markers', 'utils', 
     var regex = "."
     var latlngs = map.get
     var bBoxCoords = objectValuesToArray(map.getBounds());
-    
+
     var query = constants.start;
 
     // var keys = queryParts.keys.slice(0, 1);
@@ -687,183 +491,6 @@ define(['leaflet', 'leaflet.markercluster', 'leaflet.awesome-markers', 'utils', 
   //   document.getElementById('overpass-fetch').removeAttribute('disabled');
   // }
 
-  function fetchOverpassData(query) {
-    return new Promise((resolve, reject) => {
-      console.debug('Fetching overpass data...');
-
-      var req = new XMLHttpRequest();
-      req.open("POST", "https://overpass-api.de/api/interpreter");
-      req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-
-      req.onload = function() {
-        var json = JSON.parse(req.response);
-        if (json.elements != undefined) {
-          console.debug('Fetched overpass data');
-          resolve(json.elements);
-        } else {
-          console.error('Overpass request failed: ' + req.status + ': ' + req.statusText);
-          reject(req);
-        }
-      }
-
-      req.onerror = function() {
-        reject(req.response);
-      }
-
-      req.send('data='.concat(encodeURIComponent(query)));
-    });
-  }
-
-  function formatElem(elem) {
-    if (elem.countryCode) {
-      var countryCode = elem.countryCode
-    } else {
-      throw('Element is missing a country code, use updateMetadata() first');
-    }
-
-    for (let tag of elem.numberTags) {
-      let formatted = formatNumber(tag.original, countryCode);
-      if (!formatted) {
-        tag['formatError'] = true;
-        tag['formatted'] = tag.original;
-      } else {
-        tag['formatted'] = formatted;
-      }
-    }
-
-    return elem;
-
-    // if (!elem.country)
-    //   getCountry(elem);
-
-    // if (formatted)
-    //   deleteFormatData();
-    // formatted = true;
-
-    // var countryCode = document.getElementById('country-code').value;
-    // var tableBody = document.getElementById('opfData').getElementsByTagName('tbody')[0];
-    // for (var elem of opfData) {
-    //   if (!elem.mainKey) {
-    //     let numFormatted = libphonenumber.formatNumber({phone: cleanPrefix(elem.numOriginal), country: countryCode}, 'International');
-    //     elem['numFormatted'] = numFormatted;
-    //     elem['checked'] = false;
-    //     var row = tableBody.querySelector('[index="'+elem.index+'"][subIndex="'+elem.subIndex+'"]');
-    //     appendToTableRow(row, numFormatted, ['formatted'], [{name: 'contentEditable', value: 'true'}]);
-    //     appendToTableRow(row, elem.checked, ['checked-state'], []);
-    //   }
-    // }
-    // for (var cell of tableBody.querySelectorAll('.checked-state')) {
-    //   cell.addEventListener('click', function(e) {
-    //     toggleChecked(e.target);
-    //   });
-    // }
-
-    // NProgress.done();
-    // console.log('Formatted overpass data...');
-    // document.getElementById('format-data').removeAttribute('disabled');
-  }
-
-  /**
-   * Updates an element's metadata (or array of elements' metadata) using the nominatim API
-   *
-   * @returns the updated elem
-   */
-  function updateMetadata(elems) {
-    if (elems instanceof Array) {
-      let requests = elems.map(updateMetadataSingle);
-      return Promise.all(requests);
-    } else {
-      elem = elems;
-      return updateMetadataSingle(elem);
-    }
-  }
-
-  function updateMetadataSingle(elem) {
-    return new Promise((resolve, reject) => {
-      var type = elem.osmElem.type.slice(0, 1).toUpperCase();
-      var id = elem.osmElem.id;
-
-      var req = new XMLHttpRequest();
-      req.open("GET", `https://nominatim.openstreetmap.org/reverse?format=json&osm_type=${type}&osm_id=${id}`);
-
-      req.onload = function() {
-        var metadata = JSON.parse(req.response);
-        var name = metadata.display_name;
-        var code = metadata.address.country_code.toUpperCase();
-        if (metadata.osm_id != undefined) {
-          let name = metadata.display_name;
-          let code = metadata.address.country_code.toUpperCase();
-          elem['name'] = name;
-          elem['countryCode'] = code;
-          resolve(elem);
-        } else {
-          console.error('Overpass request failed: ' + req.status + ': ' + req.statusText);
-          reject(req);
-        }
-      }
-
-      req.onerror = function() {
-        reject(req.response);
-      }
-
-      req.send();
-    });
-  }
-
-  /**
-   * Attempts to format the provided number
-   *
-   * @returns the formatted number if a valid number was provided, false otherwise
-   */
-  function formatNumber(number, country) {
-    // Replace 2 leading zero's with '+' if present (international prefix)
-    if (number.slice(0,2) == '00') 
-      number = spliceSlice(number, 0, 2, '+');
-
-    var parsed = libphonenumber.parseNumber(number, country);
-    if (!_.isEmpty(parsed)) {
-      return libphonenumber.formatNumber(parsed, 'International');
-    } else {
-      console.error(`Couldn\'t parse "${number}" for country "${country}" :(`);
-      return false;
-    }
-  }
-
-  var deleteData = function() {
-    checkedAll = false;
-    formatted = false;
-    var tableBody = document.getElementById("opfData").getElementsByTagName('tbody')[0];
-    while (tableBody.firstChild) {
-      tableBody.removeChild(tableBody.firstChild);
-    }
-  }
-
-  var deleteFormatData = function() {
-    checkedAll = false;
-    formatted = false;
-    var elems = [].concat(Array.from(document.getElementsByClassName('formatted')), Array.from(document.getElementsByClassName('checked-state')));
-    for (var elem of elems) {
-      elem.parentNode.removeChild(elem);
-    }
-  }
-
-  var cleanPrefix = function(number) {
-    // Remove 1 leading zero if present (local number)
-    if (number.slice(0,1) == '0' && number.slice(1,2) != '0') {
-      number = spliceSlice(number, 0, 1);
-    }
-    // Replace 2 leading zero's with '+' if present (international prefix)
-    else if (number.slice(0,2) == '00') 
-      number = spliceSlice(number, 0, 2, '+');
-
-    return(number)
-  }
-
-  function spliceSlice(str, index, count, add) {
-    if (!add) add = '';
-    return str.slice(0, index) + add + str.slice(index + count);
-  }
-  
   var toggleChecked = function(cell, manual, state) {
     var parent = cell.parentElement;
     var index = parent.getAttribute('index');
@@ -991,7 +618,7 @@ define(['leaflet', 'leaflet.markercluster', 'leaflet.awesome-markers', 'utils', 
     var serializer = new XMLSerializer();
     var changesetString = serializer.serializeToString(changeset);
 
-    return changesetString;      
+    return changesetString;
   }
 
   function downloadOcs() {
@@ -1042,14 +669,11 @@ define(['leaflet', 'leaflet.markercluster', 'leaflet.awesome-markers', 'utils', 
               } else {
                 console.log(data);
               }
-            });   
+            });
           }
         });
       }
     });
-
-
- 
   }
 
   function getUserInfo() {
@@ -1066,8 +690,6 @@ define(['leaflet', 'leaflet.markercluster', 'leaflet.awesome-markers', 'utils', 
       document.getElementById('user-details').innerHTML = 'Logged in as ' + display_name + ' with user id ' + id;
     });
   }
-
   return {};
-
   }
 );
