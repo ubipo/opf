@@ -42,7 +42,7 @@ def IntersectingCountries(layerName, feature, parent):
             
     return ";".join(IntersectingCountries)
 ```
-- Export as geojson
+- Export as geojson (COORDINATE_PRECISION=5)
 - Split in individual geojson's using:
 *split-ocic-geojson.py*
 ```python
