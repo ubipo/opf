@@ -1,0 +1,1 @@
+{"version":3,"file":"OpfObject.js","sourceRoot":"","sources":["../../src/opf/OpfObject.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,SAAS,EAAE,MAAM,QAAQ,CAAC;AAcnC,MAAM,UAAU,kBAAkB,CAAC,cAA8B;IAC/D,IAAI,SAAS,GAAc,SAAS,CAAC,cAA2B,CAAC,CAAC;IAClE,SAAS,CAAC,YAAY,GAAG,EAAE,CAAC;IAC5B,OAAO,SAAS,CAAC;AACnB,CAAC"}

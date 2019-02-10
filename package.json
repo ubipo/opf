@@ -1,0 +1,39 @@
+{
+  "name": "opf",
+  "version": "1.0.0",
+  "description": "_Easily fix the formatting of phone and fax numbers on OpenStreetMap_",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "start": "webpack-dev-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ubipo/opf.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/ubipo/opf/issues"
+  },
+  "homepage": "https://github.com/ubipo/opf#readme",
+  "devDependencies": {
+    "@turf/turf": "^5.1.6",
+    "@types/google-libphonenumber": "^7.4.17",
+    "@types/lodash": "^4.14.119",
+    "copy-webpack-plugin": "^4.6.0",
+    "events": "^3.0.0",
+    "google-libphonenumber": "^3.2.2",
+    "lodash": "^4.17.11",
+    "ts-loader": "^5.3.3",
+    "typescript": "^3.2.2",
+    "webpack": "^4.28.4",
+    "webpack-cli": "^3.2.1",
+    "webpack-dev-server": "^3.1.14"
+  },
+  "dependencies": {
+    "@types/events": "^1.2.0"
+  }
+}
